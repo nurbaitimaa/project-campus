@@ -17,9 +17,13 @@
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+            <a href="/">
+                <img src="{{ asset('image/logo-mazzoni.png') }}" alt="Logo PT Mazzoni" class="w-32 h-auto mx-auto" style="background: transparent; object-fit: contain;">
+                <p class="text-center mt-2 text-gray-600 font-semibold text-sm">
+    Sistem Informasi Marketing 
+</p>
+
+            </a>
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
