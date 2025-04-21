@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalesMarketingController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProgramController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 |--------------------------------------------------------------------------
 */
 
-// Halaman depan
+// Halaman awal
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -20,7 +23,7 @@ Route::get('/dashboard', function () {
     return redirect('/redirect-dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ROUTE REDIRECT BERDASARKAN ROLE
+// Redirect sesuai role user (admin/manager)
 Route::get('/redirect-dashboard', function () {
     $user = Auth::user();
     if ($user->role === 'admin') {
@@ -32,26 +35,48 @@ Route::get('/redirect-dashboard', function () {
     }
 })->middleware(['auth']);
 
-// Dashboard untuk Admin
-Route::get('/admin-dashboard', function () {
-    return view('admin-dashboard');
-})->middleware(['auth', 'verified'])->name('admin.dashboard');
+// =======================
+// ROUTE UNTUK ADMIN
+// =======================
+Route::middleware(['auth', 'verified'])->group(function () {
 
-// Dashboard untuk Manager
-Route::get('/manager-dashboard', function () {
-    return view('manager-dashboard');
-})->middleware(['auth', 'verified'])->name('manager.dashboard');
+    // Dashboard Admin
+    Route::get('/admin-dashboard', function () {
+        return view('admin-dashboard');
+    })->name('admin.dashboard');
 
-// Grup route untuk profile
+    // Master Data
+    Route::resource('sales-marketing', SalesMarketingController::class);
+    Route::resource('customers', CustomerController::class)->middleware(['auth']);
+    Route::resource('programs', ProgramController::class);
+
+});
+
+// =======================
+// ROUTE UNTUK MANAGER
+// =======================
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Dashboard Manager
+    Route::get('/manager-dashboard', function () {
+        return view('manager-dashboard');
+    })->name('manager.dashboard');
+});
+
+// =======================
+// ROUTE UNTUK PROFILE USER
+// =======================
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Force Logout Manual (opsional)
 Route::get('/force-logout', function () {
     Auth::logout();
     return redirect('/');
 });
 
-
+// Auth Routes (dari Breeze)
 require __DIR__.'/auth.php';

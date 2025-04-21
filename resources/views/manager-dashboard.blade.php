@@ -10,11 +10,12 @@
                 <li class="nav-item"><a class="nav-link text-white" href="#">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="#">Persetujuan Program</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="#">Persetujuan Klaim</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#">Budget</a></li> <!-- ✅ Tambahan -->
                 <li class="nav-item"><a class="nav-link text-white" href="#">Laporan</a></li>
             </ul>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="btn btn-light mt-4 w-100">Keluar</button>
+                <button type="submit" class="btn btn-light mt-4 w-100">Keluar</button>
             </form>
         </div>
 
