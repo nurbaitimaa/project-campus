@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesMarketingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\AbsensiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('sales-marketing', SalesMarketingController::class);
     Route::resource('customers', CustomerController::class)->middleware(['auth']);
     Route::resource('programs', ProgramController::class);
+
+    //Menu sidebar lain
+    Route::resource('absensi', AbsensiController::class);
+    Route::get('absensi/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensi.edit');
+    Route::put('absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update');
 
 });
 

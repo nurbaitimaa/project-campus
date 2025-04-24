@@ -45,7 +45,7 @@
 </div>
 
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Program</a>
-                    <a href="#" class="block px-6 py-2 hover:bg-gray-100">Absensi</a>
+                    <a href="{{ route('absensi.index') }}" class="block px-6 py-2 hover:bg-gray-100">Absensi</a>
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Inventory</a>
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Program & Klaim</a>
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Laporan</a>
@@ -53,26 +53,10 @@
             </aside>
 
             <!-- Main Content -->
-            <main class="flex-1 p-6">
-                <!-- Main Content -->
 <main class="flex-1 p-6">
-
-    <!-- Info Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div class="bg-white p-4 rounded shadow">
-            <h2 class="text-lg font-semibold text-gray-700">Jumlah Program</h2>
-            <p class="text-3xl font-bold mt-2">25</p>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <h2 class="text-lg font-semibold text-gray-700">Jumlah Klaim</h2>
-            <p class="text-3xl font-bold mt-2">14</p>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <h2 class="text-lg font-semibold text-gray-700">Grafik Statistik</h2>
-            <div class="mt-2 text-gray-500">[Placeholder Grafik]</div>
-        </div>
-    </div>
+    @yield('content')
 </main>
+
 
             </main>
         </div>
