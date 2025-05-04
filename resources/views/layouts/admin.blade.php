@@ -46,7 +46,7 @@
 
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Program</a>
                     <a href="{{ route('absensi.index') }}" class="block px-6 py-2 hover:bg-gray-100">Absensi</a>
-                    <a href="#" class="block px-6 py-2 hover:bg-gray-100">Inventory</a>
+                    <a href="{{ route('inventory.index') }}" class="block px-6 py-2 hover:bg-gray-100">Inventory</a>
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Program & Klaim</a>
                     <a href="#" class="block px-6 py-2 hover:bg-gray-100">Laporan</a>
                 </nav>
