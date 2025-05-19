@@ -9,6 +9,8 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionController;
+use App\Http\Controllers\ProgramBerjalanController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -57,9 +59,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('absensi', AbsensiController::class);
     Route::get('absensi/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensi.edit');
     Route::put('absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update');
+    
+    //Inventory
     Route::resource('inventory', InventoryController::class);
     Route::resource('inventory-transaction', InventoryTransactionController::class)->except(['show', 'edit', 'update']);
     Route::get('/inventory/{inventory}/transactions', [InventoryTransactionController::class, 'index'])->name('inventory.transaction.index');
+
+    //program
+    Route::resource('program-berjalan', ProgramBerjalanController::class);
 
 
 });
