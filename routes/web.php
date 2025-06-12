@@ -10,7 +10,7 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\ProgramBerjalanController;
-
+use App\Http\Controllers\ProgramClaimController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,20 +55,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('customers', CustomerController::class)->middleware(['auth']);
     Route::resource('programs', ProgramController::class);
 
-    //Menu sidebar lain
+    // Menu sidebar lain
     Route::resource('absensi', AbsensiController::class);
     Route::get('absensi/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensi.edit');
     Route::put('absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update');
     
-    //Inventory
+    // Inventory
     Route::resource('inventory', InventoryController::class);
     Route::resource('inventory-transaction', InventoryTransactionController::class)->except(['show', 'edit', 'update']);
     Route::get('/inventory/{inventory}/transactions', [InventoryTransactionController::class, 'index'])->name('inventory.transaction.index');
 
-    //program
-    Route::resource('program-berjalan', ProgramBerjalanController::class);
+    // Program & Klaim
+Route::get('/program-berjalan/detail/{id}', [ProgramBerjalanController::class, 'getDetail']);
+Route::get('/program-detail/{kode_program}', [ProgramBerjalanController::class, 'getProgramDetail']);
 
+Route::resource('program-berjalan', ProgramBerjalanController::class);
 
+Route::resource('program-claims', ProgramClaimController::class)
+    ->except(['show']);
+
+Route::get('/program-claims/fetch/{id}', [ProgramClaimController::class, 'fetchProgram'])
+    ->name('program-claims.fetch');
+
+        
 });
 
 // =======================

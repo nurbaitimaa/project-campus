@@ -1,0 +1,67 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-4">
+    <h2 class="mb-4">Data Klaim Program</h2>
+
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{{ route('program-claims.create') }}" class="btn btn-primary">
+            + Tambah Klaim Baru
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Kode Transaksi</th>
+                    <th>Tanggal Klaim</th>
+                    <th>Customer</th>
+                    <th>Program</th>
+                    <th>Total Pembelian</th>
+                    <th>Jumlah Unit</th>
+                    <th>Total Klaim</th>
+                    <th>Bukti Klaim</th>
+                    <th>Dibuat</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($programClaims as $klaim)
+                    <tr>
+                        <td>{{ $klaim->kode_transaksi }}</td>
+                        <td>{{ \Carbon\Carbon::parse($klaim->tanggal_klaim)->format('d/m/Y') }}</td>
+                        <td>{{ $klaim->programBerjalan->customer->nama_customer ?? '-' }}</td>
+                        <td>{{ $klaim->programBerjalan->program->nama_program ?? '-' }}</td>
+                        <td>Rp {{ number_format($klaim->total_pembelian, 0, ',', '.') }}</td>
+                        <td>{{ $klaim->jumlah_unit ?? '-' }}</td>
+                        <td>Rp {{ number_format($klaim->total_klaim, 0, ',', '.') }}</td>
+                        <td>
+                            @if($klaim->bukti_klaim)
+                                <a href="{{ asset('storage/' . $klaim->bukti_klaim) }}" target="_blank">Lihat</a>
+                            @else
+                                Tidak ada
+                            @endif
+                        </td>
+                        <td>{{ $klaim->created_at->format('d/m/Y H:i') }}</td>
+                        <td>
+                            <a href="{{ route('program-claims.edit', $klaim->id) }}" class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                            <!-- Tombol hapus bisa ditambahkan jika diperlukan -->
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="10" class="text-center">Belum ada data klaim.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection

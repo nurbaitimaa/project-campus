@@ -43,4 +43,11 @@ class ProgramBerjalan extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    //Relasi ke program claim
+    public function claims()
+    {
+    return $this->hasMany(ProgramClaim::class);
+    }
+
 }

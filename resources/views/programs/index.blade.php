@@ -18,7 +18,9 @@
                 <th>Kode Program</th>
                 <th>Nama Program</th>
                 <th>Deskripsi</th>
-                <th>Aksi</th>
+                <th>Jenis</th>
+                <th>Parameter</th>
+                <th>Aksi</th> {{-- Aksi dipindah ke paling akhir --}}
             </tr>
         </thead>
         <tbody>
@@ -28,6 +30,8 @@
                     <td>{{ $item->kode_program }}</td>
                     <td>{{ $item->nama_program }}</td>
                     <td>{{ $item->deskripsi }}</td>
+                    <td>{{ $item->jenis_program ?? '-' }}</td>
+                    <td>{{ $item->parameter_klaim ?? '-' }}</td>
                     <td>
                         <a href="{{ route('programs.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
                         <form action="{{ route('programs.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">

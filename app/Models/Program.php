@@ -13,5 +13,7 @@ class Program extends Model
         'kode_program',
         'nama_program',
         'deskripsi',
+        'jenis_program',
+        'parameter_klaim',
     ];
 }
