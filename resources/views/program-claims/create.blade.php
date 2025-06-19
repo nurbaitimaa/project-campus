@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h4 class="fw-bold text-primary mb-4">Klaim Program</h4>
+    <h4 class="fw-bold text-primary mb-4">Form Klaim Program</h4>
 
     <form action="{{ route('program-claims.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -19,9 +19,9 @@
                     <input type="date" name="tanggal_klaim" class="form-control" required>
                 </div>
                 <div class="mb-2">
-                    <label>Pilih Program Berjalan</label>
+                    <label>Program Berjalan</label>
                     <select name="program_berjalan_id" id="programSelect" class="form-select" required>
-                        <option value="">-- Pilih --</option>
+                        <option value="">-- Pilih Program --</option>
                         @foreach($programs as $pb)
                             <option value="{{ $pb->id }}">
                                 {{ $pb->program->nama_program }} - {{ $pb->customer->nama_customer }}
@@ -49,8 +49,8 @@
                     <input type="text" id="jenis_program" class="form-control" readonly>
                 </div>
                 <div class="mb-2">
-                    <label>Parameter Klaim</label>
-                    <input type="text" id="parameter" class="form-control" readonly>
+                    <label>Tipe Klaim</label>
+                    <input type="text" id="tipe_klaim_text" class="form-control" readonly>
                 </div>
             </div>
         </div>
@@ -63,16 +63,20 @@
                         <th>No</th>
                         <th>Nama Outlet</th>
                         <th>Penjualan</th>
-                        <th>Jumlah Klaim</th>
+                        <th>Klaim Distributor</th>
+                        <th>Klaim Sistem</th>
+                        <th>Selisih</th>
                         <th>Keterangan</th>
                     </tr>
                 </thead>
                 <tbody id="claimTableBody">
                     <tr>
                         <td>1</td>
-                        <td><input type="text" name="outlets[0][nama]" class="form-control"></td>
-                        <td><input type="number" name="outlets[0][penjualan]" class="form-control penjualan-input"></td>
-                        <td><input type="text" name="outlets[0][klaim]" class="form-control klaim-output" readonly></td>
+                        <td><input type="text" name="outlets[0][nama]" class="form-control" required></td>
+                        <td><input type="number" step="0.01" name="outlets[0][penjualan]" class="form-control penjualan-input" required></td>
+                        <td><input type="number" step="0.01" name="outlets[0][klaim]" class="form-control klaim-distributor-input" required></td>
+                        <td><input type="text" class="form-control klaim-sistem-output" readonly></td>
+                        <td><input type="text" class="form-control selisih-output" readonly></td>
                         <td><input type="text" name="outlets[0][keterangan]" class="form-control"></td>
                     </tr>
                 </tbody>
@@ -80,10 +84,16 @@
             <button type="button" class="btn btn-outline-primary btn-sm" onclick="tambahBaris()">+ Tambah Baris</button>
         </div>
 
-        {{-- Total Pembelian --}}
-        <div class="mt-3 text-end">
-            <label>Total Pembelian</label>
-            <input type="text" id="totalPembelian" name="total_pembelian" class="form-control d-inline-block text-end" style="width: 200px;" readonly>
+        {{-- Total Pembelian & Klaim Sistem --}}
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label>Total Pembelian</label>
+                <input type="text" id="totalPembelian" name="total_pembelian" class="form-control text-end" readonly>
+            </div>
+            <div class="col-md-6">
+                <label>Total Klaim Sistem</label>
+                <input type="text" id="totalKlaimSistem" class="form-control text-end" readonly>
+            </div>
         </div>
 
         {{-- Tombol Aksi --}}
@@ -92,88 +102,93 @@
             <a href="{{ route('program-claims.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
 
-        {{-- Hidden Input --}}
-        <input type="hidden" id="tipe_klaim">
-        <input type="hidden" id="nilai_klaim">
+        {{-- Hidden --}}
+        <input type="hidden" id="tipe_klaim" name="tipe_klaim">
+        <input type="hidden" id="nilai_klaim" name="nilai_klaim">
+        <input type="hidden" id="min_pembelian" name="min_pembelian">
     </form>
 </div>
 
 {{-- Script --}}
 <script>
     let paramKlaim = 0;
+    let tipeKlaim = '';
+    let minPembelian = 0;
 
     document.getElementById('programSelect').addEventListener('change', function () {
-    const id = this.value;
-    if (!id) return;
+        const id = this.value;
+        if (!id) return;
 
-    fetch(`/program-claims/fetch/${id}`, {
-        method: 'GET',
-        credentials: 'same-origin' // ⬅️ Tambahkan ini agar cookie Laravel terbaca
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Gagal fetch data program.");
-        return res.json();
-    })
-    .then(data => {
-        document.getElementById('customer').value = data.customer;
-        document.getElementById('nama_program').value = data.nama_program;
-        document.getElementById('jenis_program').value = data.jenis_program;
-        document.getElementById('parameter').value = data.parameter_klaim;
-        document.getElementById('tipe_klaim').value = data.tipe_klaim;
-        document.getElementById('nilai_klaim').value = data.nilai_klaim;
+        fetch(`/program-claims/fetch/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('customer').value = data.customer;
+                document.getElementById('nama_program').value = data.nama_program;
+                document.getElementById('jenis_program').value = data.jenis_program;
+                document.getElementById('tipe_klaim_text').value = data.tipe_klaim;
+                document.getElementById('tipe_klaim').value = data.tipe_klaim;
+                document.getElementById('nilai_klaim').value = data.reward;
+                document.getElementById('min_pembelian').value = data.min_pembelian;
 
-        paramKlaim = parseFloat(data.nilai_klaim) || 0;
-        updateKlaim();
-    })
-    .catch(error => {
-        console.error("Error:", error);
+                paramKlaim = parseFloat(data.reward) || 0;
+                tipeKlaim = data.tipe_klaim || '';
+                minPembelian = parseFloat(data.min_pembelian) || 0;
+
+                updateKlaim();
+            });
     });
-});
-
 
     document.addEventListener('input', function (e) {
-        if (e.target.classList.contains('penjualan-input')) {
+        if (
+            e.target.classList.contains('penjualan-input') ||
+            e.target.classList.contains('klaim-distributor-input')
+        ) {
             updateKlaim();
         }
     });
 
     function updateKlaim() {
-        const tipe = document.getElementById('tipe_klaim').value;
-        const nilai = parseFloat(document.getElementById('nilai_klaim').value) || 0;
-        let total = 0;
+        let totalPembelian = 0;
+        let totalKlaimSistem = 0;
 
-        document.querySelectorAll('#claimTableBody tr').forEach((row, i) => {
-            const penjualanInput = row.querySelector('.penjualan-input');
-            const klaimInput = row.querySelector('.klaim-output');
-            const penjualan = parseFloat(penjualanInput.value) || 0;
+        document.querySelectorAll('#claimTableBody tr').forEach((row) => {
+            const penjualan = parseFloat(row.querySelector('.penjualan-input').value) || 0;
+            const klaimDistributor = parseFloat(row.querySelector('.klaim-distributor-input').value) || 0;
 
-            let klaim = 0;
-            if (tipe === 'rupiah') {
-                klaim = penjualan * nilai;
-            } else if (tipe === 'unit') {
-                klaim = Math.round(penjualan * nilai);
-            } else {
-                klaim = Math.round(penjualan * nilai / 100); // fallback persentase
+            let klaimSistem = 0;
+
+            if (tipeKlaim === 'rupiah') {
+                klaimSistem = penjualan >= minPembelian ? paramKlaim : 0;
+            } else if (tipeKlaim === 'persen') {
+                klaimSistem = penjualan * (paramKlaim / 100);
+            } else if (tipeKlaim === 'unit') {
+                klaimSistem = minPembelian > 0 ? Math.floor(penjualan / minPembelian) * paramKlaim : 0;
             }
 
-            klaimInput.value = klaim;
-            total += penjualan;
+            row.querySelector('.klaim-sistem-output').value = klaimSistem.toFixed(2);
+            row.querySelector('.selisih-output').value = (klaimDistributor - klaimSistem).toFixed(2);
+
+            totalPembelian += penjualan;
+            totalKlaimSistem += klaimSistem;
         });
 
-        document.getElementById('totalPembelian').value = total;
+        document.getElementById('totalPembelian').value = totalPembelian.toFixed(2);
+        document.getElementById('totalKlaimSistem').value = totalKlaimSistem.toFixed(2);
     }
 
     function tambahBaris() {
         const tbody = document.getElementById('claimTableBody');
         const rowCount = tbody.rows.length;
         const row = `
-            <tr>
-                <td>${rowCount + 1}</td>
-                <td><input type="text" name="outlets[${rowCount}][nama]" class="form-control"></td>
-                <td><input type="number" name="outlets[${rowCount}][penjualan]" class="form-control penjualan-input"></td>
-                <td><input type="text" name="outlets[${rowCount}][klaim]" class="form-control klaim-output" readonly></td>
-                <td><input type="text" name="outlets[${rowCount}][keterangan]" class="form-control"></td>
-            </tr>
+        <tr>
+            <td>${rowCount + 1}</td>
+            <td><input type="text" name="outlets[${rowCount}][nama]" class="form-control" required></td>
+            <td><input type="number" step="0.01" name="outlets[${rowCount}][penjualan]" class="form-control penjualan-input" required></td>
+            <td><input type="number" step="0.01" name="outlets[${rowCount}][klaim]" class="form-control klaim-distributor-input" required></td>
+            <td><input type="text" class="form-control klaim-sistem-output" readonly></td>
+            <td><input type="text" class="form-control selisih-output" readonly></td>
+            <td><input type="text" name="outlets[${rowCount}][keterangan]" class="form-control"></td>
+        </tr>
         `;
         tbody.insertAdjacentHTML('beforeend', row);
     }

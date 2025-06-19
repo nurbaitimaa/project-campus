@@ -15,5 +15,15 @@ class Program extends Model
         'deskripsi',
         'jenis_program',
         'parameter_klaim',
+        'tipe_klaim',
+        'min_pembelian',
+        'reward',
+        'reward_type',
     ];
+
+    // Relasi ke program berjalan
+    public function programBerjalan()
+    {
+        return $this->hasMany(ProgramBerjalan::class, 'kode_program', 'kode_program');
+    }
 }

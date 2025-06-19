@@ -23,22 +23,29 @@
                     <th>Customer</th>
                     <th>Program</th>
                     <th>Total Pembelian</th>
-                    <th>Jumlah Unit</th>
-                    <th>Total Klaim</th>
+                    <th>Total Klaim Sistem</th>
                     <th>Bukti Klaim</th>
                     <th>Dibuat</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $grandTotalPembelian = 0;
+                    $grandTotalKlaim = 0;
+                @endphp
+
                 @forelse($programClaims as $klaim)
+                    @php
+                        $grandTotalPembelian += $klaim->total_pembelian;
+                        $grandTotalKlaim += $klaim->total_klaim;
+                    @endphp
                     <tr>
                         <td>{{ $klaim->kode_transaksi }}</td>
                         <td>{{ \Carbon\Carbon::parse($klaim->tanggal_klaim)->format('d/m/Y') }}</td>
                         <td>{{ $klaim->programBerjalan->customer->nama_customer ?? '-' }}</td>
                         <td>{{ $klaim->programBerjalan->program->nama_program ?? '-' }}</td>
                         <td>Rp {{ number_format($klaim->total_pembelian, 0, ',', '.') }}</td>
-                        <td>{{ $klaim->jumlah_unit ?? '-' }}</td>
                         <td>Rp {{ number_format($klaim->total_klaim, 0, ',', '.') }}</td>
                         <td>
                             @if($klaim->bukti_klaim)
@@ -52,15 +59,24 @@
                             <a href="{{ route('program-claims.edit', $klaim->id) }}" class="btn btn-sm btn-warning">
                                 Edit
                             </a>
-                            <!-- Tombol hapus bisa ditambahkan jika diperlukan -->
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="text-center">Belum ada data klaim.</td>
+                        <td colspan="9" class="text-center">Belum ada data klaim.</td>
                     </tr>
                 @endforelse
             </tbody>
+            @if($programClaims->count() > 0)
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="4" class="text-end">Total Keseluruhan:</td>
+                    <td>Rp {{ number_format($grandTotalPembelian, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($grandTotalKlaim, 0, ',', '.') }}</td>
+                    <td colspan="3"></td>
+                </tr>
+            </tfoot>
+            @endif
         </table>
     </div>
 </div>

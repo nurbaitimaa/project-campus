@@ -24,22 +24,17 @@ class ProgramController extends Controller
             'kode_program'     => 'required|unique:programs,kode_program',
             'nama_program'     => 'required|string|max:255',
             'deskripsi'        => 'nullable|string',
-            'jenis_program'    => 'nullable|string|max:255',
-            'parameter_klaim'  => 'nullable|string|max:255',
-            'tipe_klaim'       => 'required|string|in:rupiah,unit,persen', // validasi tambahan
+            'jenis_program'    => 'required|in:diskon,bundling,target_penjualan',
+            'parameter_klaim'  => 'required|in:per_item,persen,nominal',
+            'tipe_klaim'       => 'required|in:rupiah,unit,persen',
+            'min_pembelian'    => 'nullable|numeric',
+            'reward'           => 'nullable|numeric',
+            'reward_type'      => 'nullable|in:unit,rupiah,persen',
         ]);
 
-        Program::create([
-            'kode_program'     => $request->kode_program,
-            'nama_program'     => $request->nama_program,
-            'deskripsi'        => $request->deskripsi,
-            'jenis_program'    => $request->jenis_program,
-            'parameter_klaim'  => $request->parameter_klaim,
-            'tipe_klaim'       => $request->tipe_klaim, // field baru
-        ]);
+        Program::create($request->all());
 
-        return redirect()->route('programs.index')
-                         ->with('success', 'Data program berhasil ditambahkan.');
+        return redirect()->route('programs.index')->with('success', 'Program berhasil ditambahkan.');
     }
 
     public function edit(Program $program)
@@ -50,32 +45,25 @@ class ProgramController extends Controller
     public function update(Request $request, Program $program)
     {
         $request->validate([
-            'kode_program'     => 'required|string|max:100|unique:programs,kode_program,' . $program->id,
+            'kode_program'     => 'required|unique:programs,kode_program,' . $program->id,
             'nama_program'     => 'required|string|max:255',
             'deskripsi'        => 'nullable|string',
-            'jenis_program'    => 'nullable|string|max:255',
-            'parameter_klaim'  => 'nullable|string|max:255',
-            'tipe_klaim'       => 'required|string|in:rupiah,unit,persen', // validasi tambahan
+            'jenis_program'    => 'required|in:diskon,bundling,target_penjualan',
+            'parameter_klaim'  => 'required|in:per_item,persen,nominal',
+            'tipe_klaim'       => 'required|in:rupiah,unit,persen',
+            'min_pembelian'    => 'nullable|numeric',
+            'reward'           => 'nullable|numeric',
+            'reward_type'      => 'nullable|in:unit,rupiah,persen',
         ]);
 
-        $program->update([
-            'kode_program'     => $request->kode_program,
-            'nama_program'     => $request->nama_program,
-            'deskripsi'        => $request->deskripsi,
-            'jenis_program'    => $request->jenis_program,
-            'parameter_klaim'  => $request->parameter_klaim,
-            'tipe_klaim'       => $request->tipe_klaim, // field baru
-        ]);
+        $program->update($request->all());
 
-        return redirect()->route('programs.index')
-                         ->with('success', 'Data program berhasil diperbarui.');
+        return redirect()->route('programs.index')->with('success', 'Program berhasil diperbarui.');
     }
 
     public function destroy(Program $program)
     {
         $program->delete();
-
-        return redirect()->route('programs.index')
-                         ->with('success', 'Data program berhasil dihapus.');
+        return redirect()->route('programs.index')->with('success', 'Program berhasil dihapus.');
     }
 }

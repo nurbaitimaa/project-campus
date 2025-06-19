@@ -52,6 +52,25 @@
     </select>
 </div>
 
+<div class="mb-3">
+    <label>Minimal Pembelian</label>
+    <input type="number" step="0.01" name="min_pembelian" class="form-control">
+</div>
+
+<div class="mb-3">
+    <label>Reward</label>
+    <input type="number" step="0.01" name="reward" class="form-control">
+</div>
+
+<div class="mb-3">
+    <label>Jenis Reward</label>
+    <select name="reward_type" class="form-select">
+        <option value="">-- Pilih --</option>
+        <option value="unit">Unit</option>
+        <option value="rupiah">Rupiah</option>
+        <option value="persen">Persen</option>
+    </select>
+</div>
 
 
 

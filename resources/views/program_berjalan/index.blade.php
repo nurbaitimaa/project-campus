@@ -12,6 +12,8 @@
     <div class="mb-3 d-flex justify-content-between flex-wrap">
         <a href="{{ route('program-berjalan.create') }}" class="btn btn-primary mb-2">+ Tambah Program</a>
 
+        {{-- Filter (Gunakan hanya jika variabel customers & programList dikirim) --}}
+        @if (isset($customers) && isset($programList))
         <form action="{{ route('program-berjalan.index') }}" method="GET" class="d-flex gap-2 flex-wrap">
             <select name="customer" class="form-select">
                 <option value="">Semua Customer</option>
@@ -33,6 +35,7 @@
 
             <button type="submit" class="btn btn-secondary">Filter</button>
         </form>
+        @endif
     </div>
 
     <div class="table-responsive">

@@ -24,30 +24,28 @@ class ProgramBerjalan extends Model
         'file_path',
         'status',
         'created_by',
+        'nilai_klaim_per_item',
+        'persen_klaim',
+        'nominal_klaim',
     ];
 
-    // Relasi ke master program
     public function program()
     {
         return $this->belongsTo(Program::class, 'kode_program', 'kode_program');
     }
 
-    // Relasi ke master customer
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'kode_customer', 'kode_customer');
     }
 
-    // Relasi ke user pembuat data
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    //Relasi ke program claim
     public function claims()
     {
-    return $this->hasMany(ProgramClaim::class);
+        return $this->hasMany(ProgramClaim::class);
     }
-
 }

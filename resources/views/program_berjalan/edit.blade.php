@@ -14,7 +14,8 @@
         </div>
     @endif
 
-    <form action="{{ route('program-berjalan.update', $program->id) }}" method="POST" enctype="multipart/form-data">
+    {{-- ✅ FIXED: Parameter route pakai 'program_berjalan' --}}
+    <form action="{{ route('program-berjalan.update', ['program_berjalan' => $program->id]) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -83,7 +84,9 @@
             <label>Upload File Baru (jika ingin mengganti)</label>
             <input type="file" name="file_path" class="form-control">
             @if ($program->file_path)
-                <small class="text-muted">File saat ini: <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank">Lihat</a></small>
+                <small class="text-muted">File saat ini: 
+                    <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank">Lihat</a>
+                </small>
             @endif
         </div>
 

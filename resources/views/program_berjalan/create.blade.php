@@ -8,8 +8,8 @@
         @csrf
 
         <div class="mb-3">
-            <label for="tanggal_input">Tanggal Input</label>
-            <input type="date" name="tanggal_input" id="tanggal_input" class="form-control" required>
+            <label for="tanggal">Tanggal Input</label>
+            <input type="date" name="tanggal" id="tanggal" class="form-control" required>
         </div>
 
         <div class="mb-3">
@@ -33,21 +33,19 @@
         </div>
 
         <!-- Input Klaim Dinamis -->
-        <div class="mb-3" id="input-klaim-wrapper">
-            <!-- Akan diisi via JavaScript -->
-        </div>
+        <div class="mb-3" id="input-klaim-wrapper"></div>
 
         <div class="mb-3">
             <label>Periode Program</label>
             <div class="d-flex gap-2">
-                <input type="date" name="periode_awal" class="form-control" required>
-                <input type="date" name="periode_akhir" class="form-control" required>
+                <input type="date" name="start_date" class="form-control" required>
+                <input type="date" name="end_date" class="form-control" required>
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="target_reward">Target Reward</label>
-            <input type="text" name="target_reward" id="target_reward" class="form-control">
+            <label for="target">Target Reward</label>
+            <input type="text" name="target" id="target" class="form-control">
         </div>
 
         <div class="mb-3">
@@ -56,8 +54,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="deskripsi">Deskripsi / Mekanisme</label>
-            <textarea name="deskripsi" id="deskripsi" rows="3" class="form-control"></textarea>
+            <label for="keterangan">Deskripsi / Mekanisme</label>
+            <textarea name="keterangan" id="keterangan" rows="3" class="form-control"></textarea>
         </div>
 
         <div class="mb-3">
@@ -66,8 +64,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="file">Upload File (PDF/DOC)</label>
-            <input type="file" name="file" id="file" class="form-control" accept=".pdf,.doc,.docx">
+            <label for="file_path">Upload File (PDF/DOC)</label>
+            <input type="file" name="file_path" id="file_path" class="form-control" accept=".pdf,.doc,.docx">
             <small class="form-text text-muted">Ukuran maksimal 2MB. Format: PDF, DOC, DOCX</small>
         </div>
 
@@ -78,7 +76,6 @@
     </form>
 </div>
 
-<!-- JavaScript untuk input klaim dinamis -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const selectProgram = document.getElementById('kode_program');
@@ -86,90 +83,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
     selectProgram.addEventListener('change', function () {
         const programId = this.value;
-
         if (!programId) {
             klaimWrapper.innerHTML = '';
             return;
         }
 
         fetch(`/program-detail/${programId}`)
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Gagal mengambil data program');
-                }
-                return res.json();
-            })
-            .then(data => {
-                klaimWrapper.innerHTML = '';
-
-                if (data.parameter_klaim === 'item') {
-                    klaimWrapper.innerHTML = `
-                        <label for="klaim_item">Item Klaim</label>
-                        <input type="text" name="klaim_item" id="klaim_item" class="form-control" required>
-                    `;
-                } else if (data.parameter_klaim === 'persentase') {
-                    klaimWrapper.innerHTML = `
-                        <label for="klaim_persen">Klaim Persentase (%)</label>
-                        <input type="number" name="klaim_persen" id="klaim_persen" class="form-control" step="0.01" required>
-                    `;
-                } else if (data.parameter_klaim === 'nominal') {
-                    klaimWrapper.innerHTML = `
-                        <label for="klaim_nominal">Klaim Nominal (Rp)</label>
-                        <input type="number" name="klaim_nominal" id="klaim_nominal" class="form-control" required>
-                    `;
-                }
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Terjadi kesalahan saat memuat data program. Silakan coba lagi.');
-                klaimWrapper.innerHTML = '';
-            });
-    });
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    console.log("JS Loaded ✅"); // 👈 Tambahan log
-
-    const selectProgram = document.getElementById('kode_program');
-    const klaimWrapper = document.getElementById('input-klaim-wrapper');
-
-    selectProgram.addEventListener('change', function () {
-        const programId = this.value;
-        console.log("Program selected:", programId); // 👈 Tambahan log
-
-        if (!programId) return;
-
-        fetch(`/program-detail/${programId}`)
             .then(res => res.json())
             .then(data => {
-                console.log("FETCH RESPONSE:", data); // 👈 Tambahan log
-
                 klaimWrapper.innerHTML = '';
-
                 if (data.parameter_klaim === 'item') {
                     klaimWrapper.innerHTML = `
-                        <label for="klaim_item">Item Klaim</label>
-                        <input type="text" name="klaim_item" id="klaim_item" class="form-control" required>
+                        <label for="nilai_klaim_per_item">Nilai Klaim per Item</label>
+                        <input type="number" name="nilai_klaim_per_item" id="nilai_klaim_per_item" class="form-control" required>
                     `;
-                } else if (data.parameter_klaim === 'persentase') {
+                } else if (data.parameter_klaim === 'persen') {
                     klaimWrapper.innerHTML = `
-                        <label for="klaim_persen">Klaim Persentase (%)</label>
-                        <input type="number" name="klaim_persen" id="klaim_persen" class="form-control" step="0.01" required>
+                        <label for="persen_klaim">Persentase Klaim (%)</label>
+                        <input type="number" step="0.01" name="persen_klaim" id="persen_klaim" class="form-control" required>
                     `;
-                } else if (data.parameter_klaim === 'nominal') {
+                } else if (data.parameter_klaim === 'rupiah') {
                     klaimWrapper.innerHTML = `
-                        <label for="klaim_nominal">Klaim Nominal (Rp)</label>
-                        <input type="number" name="klaim_nominal" id="klaim_nominal" class="form-control" required>
+                        <label for="nominal_klaim">Nominal Klaim (Rp)</label>
+                        <input type="number" name="nominal_klaim" id="nominal_klaim" class="form-control" required>
                     `;
                 }
             })
             .catch(error => {
                 console.error("AJAX ERROR:", error);
+                klaimWrapper.innerHTML = '';
             });
     });
 });
 </script>
-
-
 @endsection

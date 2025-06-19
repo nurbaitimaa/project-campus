@@ -23,4 +23,9 @@ class ProgramClaim extends Model
     {
         return $this->belongsTo(ProgramBerjalan::class);
     }
+
+    public function details()
+    {
+        return $this->hasMany(ProgramClaimDetail::class);
+    }
 }

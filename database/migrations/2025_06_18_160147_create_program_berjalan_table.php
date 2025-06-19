@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+public function up()
 {
     Schema::create('program_berjalan', function (Blueprint $table) {
         $table->id();
@@ -28,7 +28,16 @@ return new class extends Migration
         $table->text('keterangan')->nullable();
 
         $table->decimal('budget', 15, 2)->nullable();
-        $table->string('file_path')->nullable(); // untuk upload dokumen proposal, dll
+        $table->string('file_path')->nullable();
+
+        // Klaim-related fields
+        $table->decimal('nilai_klaim_per_item', 15, 2)->nullable();
+        $table->decimal('persen_klaim', 5, 2)->nullable();
+        $table->decimal('nominal_klaim', 15, 2)->nullable();
+
+        $table->decimal('min_pembelian', 15, 2)->nullable();
+        $table->decimal('reward', 15, 2)->nullable();
+        $table->enum('reward_type', ['unit', 'rupiah', 'persen'])->nullable();
 
         $table->enum('status', ['draft', 'menunggu persetujuan', 'disetujui', 'ditolak', 'selesai'])->default('draft');
         $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
@@ -37,12 +46,9 @@ return new class extends Migration
     });
 }
 
+public function down()
+{
+    Schema::dropIfExists('program_berjalan');
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('program_berjalan');
-    }
 };
