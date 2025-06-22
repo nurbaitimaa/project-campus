@@ -14,6 +14,8 @@ class ProgramClaimDetail extends Model
         'nama_outlet',
         'penjualan',
         'klaim_distributor',
+        'klaim_sistem',     // ✅ tambahkan
+        'selisih',           // ✅ tambahkan
         'keterangan',
     ];
 

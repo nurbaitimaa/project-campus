@@ -10,16 +10,16 @@ class Absensi extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sales_marketing_id',
-        'tanggal',
-        'jam_masuk',
-        'jam_keluar',
-        'latitude',
-        'longitude',
-        'status',
-        'keterangan',
-        'updated_by',
-    ];    
+    'sales_marketing_id',
+    'tanggal',
+    'jam_masuk',
+    'jam_keluar',
+    'status',
+    'keterangan',
+    'foto', // <- Tambahkan ini
+    'updated_by',
+];
+  
 
     public function salesMarketing()
     {

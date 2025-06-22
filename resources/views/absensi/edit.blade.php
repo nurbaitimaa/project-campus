@@ -1,58 +1,64 @@
-@extends('layouts.app') <!-- ganti sesuai layout utama kamu -->
+@extends('layouts.admin')
 
 @section('content')
-<div class="container">
-    <h4>Edit Absensi - {{ $absensi->salesMarketing->nama ?? 'Nama Sales' }}</h4>
+<div class="container mx-auto mt-6 max-w-2xl">
+    <h2 class="text-2xl font-bold mb-4">Edit Absensi</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <form action="{{ route('absensi.update', $absensi->id) }}" method="POST">
+    <form method="POST" action="{{ route('absensi.update', $absensi->id) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
-        <div class="mb-3">
-            <label>Tanggal</label>
-            <input type="date" class="form-control" value="{{ $absensi->tanggal }}" disabled>
+        <div class="mb-4">
+            <label class="block font-semibold">Nama Sales:</label>
+            <input type="text" value="{{ $absensi->salesMarketing->nama_sales }}" class="w-full border rounded px-3 py-2 bg-gray-100" disabled>
         </div>
 
-        <div class="mb-3">
-            <label>Status Kehadiran</label>
-            <select name="status" class="form-control" required>
-                <option value="Hadir" {{ $absensi->status === 'Hadir' ? 'selected' : '' }}>Hadir</option>
-                <option value="Izin" {{ $absensi->status === 'Izin' ? 'selected' : '' }}>Izin</option>
-                <option value="Alfa" {{ $absensi->status === 'Alfa' ? 'selected' : '' }}>Alfa</option>
+        <div class="mb-4">
+            <label class="block font-semibold">Tanggal:</label>
+            <input type="date" value="{{ $absensi->tanggal }}" class="w-full border rounded px-3 py-2 bg-gray-100" disabled>
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold">Jam Masuk:</label>
+            <input type="time" name="jam_masuk" value="{{ $absensi->jam_masuk }}" class="w-full border rounded px-3 py-2">
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold">Jam Keluar:</label>
+            <input type="time" name="jam_keluar" value="{{ $absensi->jam_keluar }}" class="w-full border rounded px-3 py-2">
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold">Status:</label>
+            <select name="status" class="w-full border rounded px-3 py-2">
+                <option value="Hadir" {{ $absensi->status == 'Hadir' ? 'selected' : '' }}>Hadir</option>
+                <option value="Izin" {{ $absensi->status == 'Izin' ? 'selected' : '' }}>Izin</option>
+                <option value="Alfa" {{ $absensi->status == 'Alfa' ? 'selected' : '' }}>Alfa</option>
+                <option value="Sakit" {{ $absensi->status == 'Sakit' ? 'selected' : '' }}>Sakit</option>
             </select>
         </div>
 
-        <div class="mb-3">
-            <label>Jam Masuk</label>
-            <input type="time" name="jam_masuk" class="form-control" value="{{ $absensi->jam_masuk }}">
+        <div class="mb-4">
+            <label class="block font-semibold">Keterangan:</label>
+            <textarea name="keterangan" class="w-full border rounded px-3 py-2">{{ $absensi->keterangan }}</textarea>
         </div>
 
-        <div class="mb-3">
-            <label>Jam Keluar</label>
-            <input type="time" name="jam_keluar" class="form-control" value="{{ $absensi->jam_keluar }}">
+        <div class="mb-4">
+            <label class="block font-semibold">Foto Absensi:</label>
+            @if($absensi->foto)
+                <p class="mb-2">Foto Saat Ini:
+                    <a href="{{ asset('storage/' . $absensi->foto) }}" target="_blank" class="text-blue-500 underline">Lihat Foto</a>
+                </p>
+            @endif
+            <input type="file" name="foto" class="w-full border rounded px-3 py-2" accept="image/*">
+            <small class="text-gray-500">Biarkan kosong jika tidak ingin mengubah foto.</small>
         </div>
 
-        <div class="mb-3">
-            <label>Latitude (Lokasi Masuk)</label>
-            <input type="text" name="latitude" class="form-control" value="{{ $absensi->latitude }}">
+        <div class="mt-6">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded">
+                Update Absensi
+            </button>
         </div>
-
-        <div class="mb-3">
-            <label>Longitude (Lokasi Keluar)</label>
-            <input type="text" name="longitude" class="form-control" value="{{ $absensi->longitude }}">
-        </div>
-
-        <div class="mb-3">
-            <label>Keterangan</label>
-            <textarea name="keterangan" class="form-control">{{ $absensi->keterangan }}</textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-        <a href="{{ route('absensi.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 @endsection

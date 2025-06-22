@@ -55,10 +55,16 @@
                             @endif
                         </td>
                         <td>{{ $klaim->created_at->format('d/m/Y H:i') }}</td>
-                        <td>
-                            <a href="{{ route('program-claims.edit', $klaim->id) }}" class="btn btn-sm btn-warning">
-                                Edit
-                            </a>
+                        <td class="text-center">
+                            <a href="{{ route('program-claims.edit', $klaim->id) }}" class="btn btn-sm btn-warning mb-1">Edit</a>
+                            <form action="{{ route('program-claims.destroy', $klaim->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus klaim ini?')" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                            </form>
+<a href="{{ route('program-claims.preview', $klaim->id) }}" class="btn btn-sm btn-info mb-1" target="_blank">
+    Preview
+</a>
                         </td>
                     </tr>
                 @empty

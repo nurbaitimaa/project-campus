@@ -76,6 +76,10 @@ Route::resource('program-claims', ProgramClaimController::class)
 
 Route::get('/program-claims/fetch/{id}', [ProgramClaimController::class, 'fetchProgram'])
     ->name('program-claims.fetch');
+Route::get('/program-claims/{id}/edit', [ProgramClaimController::class, 'edit'])->name('program-claims.edit');
+Route::put('/program-claims/{id}', [ProgramClaimController::class, 'update'])->name('program-claims.update');
+Route::delete('/program-claims/{id}', [ProgramClaimController::class, 'destroy'])->name('program-claims.destroy');
+Route::get('/program-claims/{id}/preview', [ProgramClaimController::class, 'preview'])->name('program-claims.preview');
 
         
 });

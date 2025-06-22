@@ -17,25 +17,31 @@ class AbsensiController extends Controller
 
 
     public function store(Request $request)
-    {
-        $tanggal = $request->tanggal;
-        $data = $request->data;
+{
+    $tanggal = $request->tanggal;
+    $data = $request->data;
 
-        foreach ($data as $item) {
-            Absensi::create([
-                'tanggal'            => $tanggal,
-                'sales_marketing_id' => $item['sales_marketing_id'],
-                'jam_masuk'          => $item['check_in'] ?? null,
-                'latitude'           => $item['lokasi_in'] ?? null,
-                'jam_keluar'         => $item['check_out'] ?? null,
-                'longitude'          => $item['lokasi_out'] ?? null,
-                'status'             => $item['presensi'],
-                'keterangan'         => $item['keterangan'] ?? null,
-            ]);
+    foreach ($data as $index => $item) {
+        $fotoPath = null;
+
+        if (isset($item['foto']) && $item['foto'] instanceof \Illuminate\Http\UploadedFile) {
+            $fotoPath = $item['foto']->store('absensi', 'public');
         }
 
-        return redirect()->route('absensi.index')->with('success', 'Absensi berhasil disimpan!');
+        Absensi::create([
+            'tanggal'            => $tanggal,
+            'sales_marketing_id' => $item['sales_marketing_id'],
+            'jam_masuk'          => $item['check_in'] ?? null,
+            'jam_keluar'         => $item['check_out'] ?? null,
+            'status'             => $item['presensi'],
+            'keterangan'         => $item['keterangan'] ?? null,
+            'foto'               => $fotoPath,
+        ]);
     }
+
+    return redirect()->route('absensi.index')->with('success', 'Absensi berhasil disimpan!');
+}
+
 
     public function edit(Absensi $absensi)
     {
@@ -43,26 +49,36 @@ class AbsensiController extends Controller
     }
 
     public function update(Request $request, Absensi $absensi)
-    {
-        $request->validate([
-            'jam_masuk'  => 'nullable|date_format:H:i',
-            'jam_keluar' => 'nullable|date_format:H:i',
-            'latitude'   => 'nullable|string',
-            'longitude'  => 'nullable|string',
-            'status'     => 'required|in:Hadir,Izin,Alfa',
-            'keterangan' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'jam_masuk'  => 'nullable|date_format:H:i',
+        'jam_keluar' => 'nullable|date_format:H:i',
+        'status'     => 'required|in:Hadir,Izin,Alfa,Sakit',
+        'keterangan' => 'nullable|string',
+        'foto'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
 
-        $absensi->update([
-            'jam_masuk'  => $request->jam_masuk,
-            'jam_keluar' => $request->jam_keluar,
-            'latitude'   => $request->latitude,
-            'longitude'  => $request->longitude,
-            'status'     => $request->status,
-            'keterangan' => $request->keterangan,
-            'updated_by' => auth()->user()->id,
-        ]);
+    // Handle upload foto baru (jika ada)
+    if ($request->hasFile('foto')) {
+        // Hapus foto lama jika ada
+        if ($absensi->foto && \Storage::disk('public')->exists($absensi->foto)) {
+            \Storage::disk('public')->delete($absensi->foto);
+        }
 
-        return redirect()->route('absensi.index')->with('success', 'Data absensi berhasil diperbarui.');
+        // Simpan foto baru
+        $absensi->foto = $request->file('foto')->store('absensi', 'public');
     }
+
+    $absensi->update([
+        'jam_masuk'  => $request->jam_masuk,
+        'jam_keluar' => $request->jam_keluar,
+        'status'     => $request->status,
+        'keterangan' => $request->keterangan,
+        'foto'       => $absensi->foto,
+        'updated_by' => auth()->user()->id,
+    ]);
+
+    return redirect()->route('absensi.index')->with('success', 'Data absensi berhasil diperbarui.');
+}
+
 }
