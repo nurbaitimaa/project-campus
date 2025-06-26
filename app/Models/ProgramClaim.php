@@ -17,6 +17,7 @@ class ProgramClaim extends Model
         'jumlah_unit',
         'total_klaim',
         'bukti_klaim',
+        'status',
     ];
 
     public function programBerjalan()

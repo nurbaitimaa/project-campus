@@ -5,7 +5,9 @@
     <h2 class="mb-4">Data Klaim Program</h2>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
     @endif
 
     <div class="d-flex justify-content-between mb-3">
@@ -24,6 +26,7 @@
                     <th>Program</th>
                     <th>Total Pembelian</th>
                     <th>Total Klaim Sistem</th>
+                    <th>Status</th>
                     <th>Bukti Klaim</th>
                     <th>Dibuat</th>
                     <th>Aksi</th>
@@ -48,6 +51,17 @@
                         <td>Rp {{ number_format($klaim->total_pembelian, 0, ',', '.') }}</td>
                         <td>Rp {{ number_format($klaim->total_klaim, 0, ',', '.') }}</td>
                         <td>
+                            @if($klaim->status === 'pending')
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            @elseif($klaim->status === 'approved')
+                                <span class="badge bg-success">Approved</span>
+                            @elseif($klaim->status === 'rejected')
+                                <span class="badge bg-danger">Rejected</span>
+                            @else
+                                <span class="badge bg-secondary">-</span>
+                            @endif
+                        </td>
+                        <td>
                             @if($klaim->bukti_klaim)
                                 <a href="{{ asset('storage/' . $klaim->bukti_klaim) }}" target="_blank">Lihat</a>
                             @else
@@ -62,14 +76,14 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
                             </form>
-<a href="{{ route('program-claims.preview', $klaim->id) }}" class="btn btn-sm btn-info mb-1" target="_blank">
-    Preview
-</a>
+                            <a href="{{ route('program-claims.preview', $klaim->id) }}" class="btn btn-sm btn-info mb-1" target="_blank">
+                                Preview
+                            </a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center">Belum ada data klaim.</td>
+                        <td colspan="10" class="text-center">Belum ada data klaim.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -79,7 +93,7 @@
                     <td colspan="4" class="text-end">Total Keseluruhan:</td>
                     <td>Rp {{ number_format($grandTotalPembelian, 0, ',', '.') }}</td>
                     <td>Rp {{ number_format($grandTotalKlaim, 0, ',', '.') }}</td>
-                    <td colspan="3"></td>
+                    <td colspan="4"></td>
                 </tr>
             </tfoot>
             @endif
