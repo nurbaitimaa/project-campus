@@ -47,17 +47,15 @@ class ProgramBerjalanController extends Controller
             'target'               => 'nullable|string',
             'pic'                  => 'nullable|string',
             'keterangan'           => 'nullable|string',
-            'budget'               => 'nullable|numeric',
             'file_path'            => 'nullable|file|mimes:pdf,doc,docx|max:2048',
-            'nilai_klaim_per_item' => 'nullable|numeric',
-            'persen_klaim'         => 'nullable|numeric',
-            'nominal_klaim'        => 'nullable|numeric',
+            'min_pembelian' => 'nullable|numeric',
+    'reward'        => 'nullable|numeric',
+    'reward_type'   => 'nullable|in:unit,rupiah,persen',
         ]);
 
         $data = $request->only([
             'tanggal', 'kode_customer', 'kode_program', 'start_date', 'end_date',
-            'target', 'pic', 'keterangan', 'budget',
-            'nilai_klaim_per_item', 'persen_klaim', 'nominal_klaim',
+    'target', 'pic', 'keterangan', 'min_pembelian', 'reward', 'reward_type',
         ]);
 
         $data['created_by'] = auth()->id();
@@ -95,17 +93,15 @@ class ProgramBerjalanController extends Controller
             'target'               => 'nullable|string',
             'pic'                  => 'nullable|string',
             'keterangan'           => 'nullable|string',
-            'budget'               => 'nullable|numeric',
             'file_path'            => 'nullable|file|mimes:pdf,doc,docx|max:2048',
-            'nilai_klaim_per_item' => 'nullable|numeric',
-            'persen_klaim'         => 'nullable|numeric',
-            'nominal_klaim'        => 'nullable|numeric',
+            'min_pembelian' => 'nullable|numeric',
+    'reward'        => 'nullable|numeric',
+    'reward_type'   => 'nullable|in:unit,rupiah,persen',
         ]);
 
         $data = $request->only([
             'tanggal', 'kode_customer', 'kode_program', 'start_date', 'end_date',
-            'target', 'pic', 'keterangan', 'budget',
-            'nilai_klaim_per_item', 'persen_klaim', 'nominal_klaim',
+    'target', 'pic', 'keterangan', 'min_pembelian', 'reward', 'reward_type',
         ]);
 
         if ($request->hasFile('file_path')) {

@@ -27,9 +27,6 @@ class ProgramController extends Controller
             'jenis_program'    => 'required|in:diskon,bundling,target_penjualan',
             'parameter_klaim'  => 'required|in:per_item,persen,nominal',
             'tipe_klaim'       => 'required|in:rupiah,unit,persen',
-            'min_pembelian'    => 'nullable|numeric',
-            'reward'           => 'nullable|numeric',
-            'reward_type'      => 'nullable|in:unit,rupiah,persen',
         ]);
 
         Program::create($request->all());
@@ -51,9 +48,6 @@ class ProgramController extends Controller
             'jenis_program'    => 'required|in:diskon,bundling,target_penjualan',
             'parameter_klaim'  => 'required|in:per_item,persen,nominal',
             'tipe_klaim'       => 'required|in:rupiah,unit,persen',
-            'min_pembelian'    => 'nullable|numeric',
-            'reward'           => 'nullable|numeric',
-            'reward_type'      => 'nullable|in:unit,rupiah,persen',
         ]);
 
         $program->update($request->all());

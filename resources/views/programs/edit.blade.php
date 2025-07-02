@@ -77,37 +77,6 @@
             @enderror
         </div>
 
-        {{-- Minimal Pembelian --}}
-        <div class="mb-3">
-            <label for="min_pembelian" class="form-label">Minimal Pembelian</label>
-            <input type="number" step="0.01" name="min_pembelian" class="form-control" value="{{ old('min_pembelian', $program->min_pembelian) }}">
-            @error('min_pembelian')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        {{-- Reward --}}
-        <div class="mb-3">
-            <label for="reward" class="form-label">Reward</label>
-            <input type="number" step="0.01" name="reward" class="form-control" value="{{ old('reward', $program->reward) }}">
-            @error('reward')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        {{-- Jenis Reward --}}
-        <div class="mb-3">
-            <label for="reward_type" class="form-label">Jenis Reward</label>
-            <select name="reward_type" class="form-control">
-                <option value="">-- Pilih --</option>
-                <option value="unit" {{ old('reward_type', $program->reward_type) == 'unit' ? 'selected' : '' }}>Unit</option>
-                <option value="rupiah" {{ old('reward_type', $program->reward_type) == 'rupiah' ? 'selected' : '' }}>Rupiah</option>
-                <option value="persen" {{ old('reward_type', $program->reward_type) == 'persen' ? 'selected' : '' }}>Persen</option>
-            </select>
-            @error('reward_type')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
 
         {{-- Tombol --}}
         <div class="mt-4">

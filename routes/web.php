@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ProgramBerjalanController;
 use App\Http\Controllers\ProgramClaimController;
 use App\Http\Controllers\ProgramClaimApprovalController;
 use App\Http\Controllers\MarketingBudgetController;
+use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -47,9 +49,56 @@ Route::get('/redirect-dashboard', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard Admin
-    Route::get('/admin-dashboard', function () {
-        return view('admin-dashboard');
-    })->name('admin.dashboard');
+    // routes/web.php
+Route::get('/admin-dashboard', function () {
+    // 1. Data untuk Kartu Statistik (sudah ada)
+    $stats = [
+        'programs' => \App\Models\Program::count(),
+        'customers' => \App\Models\Customer::count(),
+        'sales' => \App\Models\SalesMarketing::count(),
+        'pending_claims' => \App\Models\ProgramClaim::where('status', 'pending')->count(),
+    ];
+
+    // 2. Data untuk Grafik Aktivitas Bulanan (Baru)
+    $currentYear = date('Y');
+    
+    // Ambil data program baru per bulan
+    $programs_monthly = \App\Models\Program::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(*) as count')
+        )
+        ->whereYear('created_at', $currentYear)
+        ->groupBy('month')
+        ->pluck('count', 'month');
+
+    // Ambil data klaim masuk per bulan
+    $claims_monthly = \App\Models\ProgramClaim::select(
+            DB::raw('MONTH(tanggal_klaim) as month'),
+            DB::raw('COUNT(*) as count')
+        )
+        ->whereYear('tanggal_klaim', $currentYear)
+        ->groupBy('month')
+        ->pluck('count', 'month');
+        
+    // Siapkan array 12 bulan
+    $program_chart_data = array_fill(1, 12, 0);
+    $claim_chart_data = array_fill(1, 12, 0);
+
+    // Isi array dengan data dari database
+    foreach ($programs_monthly as $month => $count) {
+        $program_chart_data[$month] = $count;
+    }
+    foreach ($claims_monthly as $month => $count) {
+        $claim_chart_data[$month] = $count;
+    }
+
+    // Kirim semua data ke view
+    return view('admin-dashboard', [
+        'stats' => $stats,
+        'program_chart_data' => array_values($program_chart_data), // kirim sebagai array biasa
+        'claim_chart_data' => array_values($claim_chart_data) // kirim sebagai array biasa
+    ]);
+})->name('admin.dashboard');
 
     // Master Data
     Route::resource('sales-marketing', SalesMarketingController::class);
@@ -88,8 +137,32 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
 
     // Dashboard Manager
     Route::get('/manager-dashboard', function () {
-        return view('manager-dashboard');
-    })->name('manager.dashboard');
+    $currentYear = date('Y');
+
+    // 1. Ambil data untuk kartu statistik
+    $pending_claims_count = \App\Models\ProgramClaim::where('status', 'pending')->count();
+    $total_budget = \App\Models\MarketingBudget::where('tahun_anggaran', $currentYear)->sum('nilai_budget');
+    $budget_used = \App\Models\ProgramClaim::where('status', 'approved')
+                        ->whereYear('tanggal_klaim', $currentYear)
+                        ->sum('total_klaim');
+    $budget_remaining = $total_budget - $budget_used;
+
+    // 2. Ambil 5 klaim terbaru yang menunggu persetujuan
+    $recent_claims = \App\Models\ProgramClaim::with('programBerjalan.customer', 'programBerjalan.program')
+                        ->where('status', 'pending')
+                        ->latest('tanggal_klaim')
+                        ->take(5)
+                        ->get();
+    
+    // Kirim semua data ke view
+    return view('manager-dashboard', [
+        'pending_claims_count' => $pending_claims_count,
+        'total_budget' => $total_budget,
+        'budget_used' => $budget_used,
+        'budget_remaining' => $budget_remaining,
+        'recent_claims' => $recent_claims,
+    ]);
+})->name('manager.dashboard')->middleware(['auth', 'verified', 'role:manager']);
 
     // Approval Klaim Program
     Route::get('/approve-program-claims', [ProgramClaimApprovalController::class, 'index'])->name('approval.index');
@@ -106,7 +179,16 @@ Route::middleware(['auth', 'verified', 'role:manager'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('marketing-budgets', [MarketingBudgetController::class, 'index'])->name('marketing-budgets.index');
 });
-
+Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/absensi', [ReportController::class, 'absensi'])->name('absensi');
+        Route::get('/absensi/export-excel', [ReportController::class, 'exportAbsensiExcel'])->name('absensi.exportExcel');
+        Route::get('/inventory', [ReportController::class, 'inventory'])->name('inventory');
+        Route::get('/klaim', [ReportController::class, 'klaim'])->name('klaim');
+        Route::get('/program', [ReportController::class, 'program'])->name('program');
+        Route::get('/budget', [ReportController::class, 'budget'])->name('budget');
+        Route::get('/budget/export-excel', [ReportController::class, 'exportBudgetExcel'])->name('budget.exportExcel');
+    });
 
 // =======================
 // ROUTE UNTUK PROFILE USER

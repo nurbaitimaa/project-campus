@@ -9,6 +9,11 @@ class Program extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'kode_program',
         'nama_program',
@@ -16,12 +21,15 @@ class Program extends Model
         'jenis_program',
         'parameter_klaim',
         'tipe_klaim',
-        'min_pembelian',
-        'reward',
-        'reward_type',
+        // HAPUS KOLOM-KOLOM DI BAWAH INI:
+        // 'min_pembelian',
+        // 'reward',
+        // 'reward_type',
     ];
 
-    // Relasi ke program berjalan
+    /**
+     * Relasi ke program berjalan
+     */
     public function programBerjalan()
     {
         return $this->hasMany(ProgramBerjalan::class, 'kode_program', 'kode_program');

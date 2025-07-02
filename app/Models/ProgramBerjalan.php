@@ -11,6 +11,11 @@ class ProgramBerjalan extends Model
 
     protected $table = 'program_berjalan';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'tanggal',
         'kode_customer',
@@ -20,13 +25,14 @@ class ProgramBerjalan extends Model
         'target',
         'pic',
         'keterangan',
-        'budget',
         'file_path',
         'status',
         'created_by',
-        'nilai_klaim_per_item',
-        'persen_klaim',
-        'nominal_klaim',
+        
+        // PASTIKAN KOLOM-KOLOM INI ADA DI DALAM $fillable
+        'min_pembelian',
+        'reward',
+        'reward_type',
     ];
 
     public function program()

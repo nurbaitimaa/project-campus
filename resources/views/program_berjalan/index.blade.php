@@ -47,9 +47,8 @@
                     <th>Customer</th>
                     <th>Program</th>
                     <th>Periode</th>
-                    <th>Target</th>
+                    <th>Deskripsi</th>
                     <th>PIC</th>
-                    <th>Budget</th>
                     <th>File</th>
                     <th>Aksi</th>
                 </tr>
@@ -67,7 +66,6 @@
                         </td>
                         <td>{{ $program->target }}</td>
                         <td>{{ $program->pic }}</td>
-                        <td>Rp {{ number_format($program->budget, 0, ',', '.') }}</td>
                         <td>
                             @if ($program->file_path)
                                 <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank">Lihat File</a>

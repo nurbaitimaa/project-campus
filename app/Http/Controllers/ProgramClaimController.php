@@ -39,11 +39,10 @@ class ProgramClaimController extends Controller
             'outlets.*.klaim' => 'required|numeric',
         ]);
 
-        $pb = ProgramBerjalan::with('program')->findOrFail($request->program_berjalan_id);
-        $tipe = $pb->program->tipe_klaim;
-        $minPembelian = floatval($pb->program->min_pembelian ?? 0);
-        $reward = floatval($pb->program->reward ?? 0);
-        $totalKlaim = 0;
+        $pb = ProgramBerjalan::findOrFail($request->program_berjalan_id);
+        $tipeReward = $pb->reward_type;
+        $minPembelian = floatval($pb->min_pembelian ?? 0);
+        $reward = floatval($pb->reward ?? 0);
 
         $klaim = new ProgramClaim();
         $klaim->kode_transaksi = $request->kode_transaksi;
@@ -55,32 +54,28 @@ class ProgramClaimController extends Controller
         if ($request->hasFile('bukti_klaim')) {
             $klaim->bukti_klaim = $request->file('bukti_klaim')->store('bukti_klaim', 'public');
         }
-
         $klaim->save();
+
+        $totalKlaimSistem = 0;
 
         foreach ($request->outlets as $data) {
             $penjualan = floatval($data['penjualan']);
             $klaimDistributor = floatval($data['klaim']);
             $klaimSistem = 0;
+            $syaratTerpenuhi = $penjualan >= $minPembelian;
 
-            if ($tipe === 'persen') {
-                $klaimSistem = $penjualan * ($reward / 100);
-            } elseif ($tipe === 'rupiah') {
-                $klaimSistem = $penjualan >= $minPembelian ? $reward : 0;
-            } elseif ($tipe === 'unit') {
-                $kelipatan = $minPembelian > 0 ? floor($penjualan / $minPembelian) : 0;
-                $klaimSistem = $kelipatan * $reward;
+            if ($syaratTerpenuhi) {
+                if ($tipeReward === 'persen') {
+                    $klaimSistem = $penjualan * ($reward / 100);
+                } elseif ($tipeReward === 'rupiah') {
+                    $klaimSistem = $reward;
+                } elseif ($tipeReward === 'unit') {
+                    $kelipatan = $minPembelian > 0 ? floor($penjualan / $minPembelian) : 0;
+                    $klaimSistem = $kelipatan * $reward;
+                }
             }
 
-            $totalKlaim += $klaimSistem;
-
-            Log::info('Hitung Klaim:', [
-                'penjualan' => $penjualan,
-                'minPembelian' => $minPembelian,
-                'reward' => $reward,
-                'tipe' => $tipe,
-                'klaimSistem' => $klaimSistem,
-            ]);
+            $totalKlaimSistem += $klaimSistem;
 
             ProgramClaimDetail::create([
                 'program_claim_id' => $klaim->id,
@@ -93,7 +88,7 @@ class ProgramClaimController extends Controller
             ]);
         }
 
-        $klaim->total_klaim = $totalKlaim;
+        $klaim->total_klaim = $totalKlaimSistem;
         $klaim->save();
 
         return redirect()->route('program-claims.index')->with('success', 'Klaim berhasil disimpan.');
@@ -104,16 +99,14 @@ class ProgramClaimController extends Controller
         $programClaim = ProgramClaim::with('details', 'programBerjalan.program', 'programBerjalan.customer')->findOrFail($id);
         $programs = ProgramBerjalan::with('program', 'customer')->get();
 
-        $program = $programClaim->programBerjalan->program;
-
         return view('program-claims.edit', [
             'programClaim' => $programClaim,
             'programs' => $programs,
             'customer' => $programClaim->programBerjalan->customer->nama_customer,
-            'nama_program' => $program->nama_program,
-            'jenis_program' => $program->jenis_program,
-            'tipe_klaim' => $program->tipe_klaim,
-            'nilai_klaim' => $program->reward,
+            'nama_program' => $programClaim->programBerjalan->program->nama_program,
+            'jenis_program' => $programClaim->programBerjalan->program->jenis_program,
+            'tipe_klaim' => $programClaim->programBerjalan->program->tipe_klaim,
+            'nilai_klaim' => $programClaim->programBerjalan->reward,
         ]);
     }
 
@@ -129,10 +122,10 @@ class ProgramClaimController extends Controller
             'outlets.*.klaim' => 'required|numeric',
         ]);
 
-        $pb = ProgramBerjalan::with('program')->findOrFail($request->program_berjalan_id);
-        $tipe = $pb->program->tipe_klaim;
-        $minPembelian = floatval($pb->program->min_pembelian ?? 0);
-        $reward = floatval($pb->program->reward ?? 0);
+        $pb = ProgramBerjalan::findOrFail($request->program_berjalan_id);
+        $tipeReward = $pb->reward_type;
+        $minPembelian = floatval($pb->min_pembelian ?? 0);
+        $reward = floatval($pb->reward ?? 0);
 
         $programClaim = ProgramClaim::findOrFail($id);
         $programClaim->tanggal_klaim = $request->tanggal_klaim;
@@ -140,29 +133,33 @@ class ProgramClaimController extends Controller
         $programClaim->total_pembelian = $request->total_pembelian;
 
         if ($request->hasFile('bukti_klaim')) {
+            if ($programClaim->bukti_klaim && Storage::disk('public')->exists($programClaim->bukti_klaim)) {
+                Storage::disk('public')->delete($programClaim->bukti_klaim);
+            }
             $programClaim->bukti_klaim = $request->file('bukti_klaim')->store('bukti_klaim', 'public');
         }
 
-        $programClaim->save();
-
         ProgramClaimDetail::where('program_claim_id', $programClaim->id)->delete();
+        $totalKlaimSistem = 0;
 
-        $totalKlaim = 0;
         foreach ($request->outlets as $data) {
             $penjualan = floatval($data['penjualan']);
             $klaimDistributor = floatval($data['klaim']);
             $klaimSistem = 0;
+            $syaratTerpenuhi = $penjualan >= $minPembelian;
 
-            if ($tipe === 'persen') {
-                $klaimSistem = $penjualan * ($reward / 100);
-            } elseif ($tipe === 'rupiah') {
-                $klaimSistem = $penjualan >= $minPembelian ? $reward : 0;
-            } elseif ($tipe === 'unit') {
-                $kelipatan = $minPembelian > 0 ? floor($penjualan / $minPembelian) : 0;
-                $klaimSistem = $kelipatan * $reward;
+            if ($syaratTerpenuhi) {
+                if ($tipeReward === 'persen') {
+                    $klaimSistem = $penjualan * ($reward / 100);
+                } elseif ($tipeReward === 'rupiah') {
+                    $klaimSistem = $reward;
+                } elseif ($tipeReward === 'unit') {
+                    $kelipatan = $minPembelian > 0 ? floor($penjualan / $minPembelian) : 0;
+                    $klaimSistem = $kelipatan * $reward;
+                }
             }
-
-            $totalKlaim += $klaimSistem;
+            
+            $totalKlaimSistem += $klaimSistem;
 
             ProgramClaimDetail::create([
                 'program_claim_id' => $programClaim->id,
@@ -175,12 +172,20 @@ class ProgramClaimController extends Controller
             ]);
         }
 
-        $programClaim->total_klaim = $totalKlaim;
+        $programClaim->total_klaim = $totalKlaimSistem;
         $programClaim->save();
 
         return redirect()->route('program-claims.index')->with('success', 'Klaim berhasil diperbarui.');
     }
+    
+    // --- FUNGSI BARU UNTUK PREVIEW ---
+    public function preview($id)
+    {
+        $claim = ProgramClaim::with('details', 'programBerjalan.program', 'programBerjalan.customer')->findOrFail($id);
+        return view('program-claims.preview', compact('claim'));
+    }
 
+    // --- FUNGSI BARU UNTUK HAPUS ---
     public function destroy($id)
     {
         $claim = ProgramClaim::findOrFail($id);
@@ -195,26 +200,18 @@ class ProgramClaimController extends Controller
 
         return redirect()->route('program-claims.index')->with('success', 'Data klaim berhasil dihapus.');
     }
-
-    public function preview($id)
-    {
-        $claim = ProgramClaim::with('details', 'programBerjalan.program', 'programBerjalan.customer')->findOrFail($id);
-
-        return view('program-claims.preview', compact('claim'));
-    }
-
+    
     public function fetchProgram($id)
     {
-        $pb = ProgramBerjalan::with('program', 'customer')->findOrFail($id);
-
+        $pb = ProgramBerjalan::with(['program', 'customer'])->findOrFail($id);
         return response()->json([
-            'customer' => $pb->customer->nama_customer,
-            'nama_program' => $pb->program->nama_program,
+            'customer'      => $pb->customer->nama_customer,
+            'nama_program'  => $pb->program->nama_program,
             'jenis_program' => $pb->program->jenis_program,
-            'tipe_klaim' => $pb->program->tipe_klaim,
-            'parameter_klaim' => $pb->program->parameter_klaim,
-            'min_pembelian' => floatval($pb->program->min_pembelian ?? 0),
-            'reward' => floatval($pb->program->reward ?? 0),
+            'tipe_klaim'    => $pb->program->tipe_klaim,
+            'min_pembelian' => floatval($pb->min_pembelian ?? 0),
+            'reward'        => floatval($pb->reward ?? 0),
+            'reward_type'   => $pb->reward_type,
         ]);
     }
 
@@ -224,8 +221,4 @@ class ProgramClaimController extends Controller
         $last = ProgramClaim::where('kode_transaksi', 'like', $prefix . '%')->count() + 1;
         return $prefix . str_pad($last, 3, '0', STR_PAD_LEFT);
     }
-
-
-
-    
 }
