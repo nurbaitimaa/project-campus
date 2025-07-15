@@ -1,120 +1,134 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('page-title', 'Form Klaim Program')
 
 @section('content')
-<div class="container">
-    <h4 class="fw-bold text-primary mb-4">Form Klaim Program</h4>
-
-    <form action="{{ route('program-claims.store') }}" method="POST" enctype="multipart/form-data">
+<div class="max-w-7xl mx-auto">
+    <form action="{{ route('program-claims.store') }}" method="POST" enctype="multipart/form-data" id="claim-form">
         @csrf
-
-        {{-- Informasi Umum --}}
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-2">
-                    <label>Kode Transaksi</label>
-                    <input type="text" name="kode_transaksi" class="form-control" value="{{ $kodeTransaksi }}" readonly>
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            
+            {{-- Informasi Umum --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+                {{-- Kolom Kiri --}}
+                <div class="space-y-6">
+                    <div>
+                        <label for="kode_transaksi" class="block text-sm font-medium text-slate-700">Kode Transaksi</label>
+                        <input type="text" name="kode_transaksi" id="kode_transaksi" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm" value="{{ $kodeTransaksi }}" readonly>
+                    </div>
+                    <div>
+                        <label for="tanggal_klaim" class="block text-sm font-medium text-slate-700">Tanggal Klaim</label>
+                        <input type="date" name="tanggal_klaim" id="tanggal_klaim" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="programSelect" class="block text-sm font-medium text-slate-700">Program Berjalan</label>
+                        <select name="program_berjalan_id" id="programSelect" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                            <option value="">-- Pilih Program --</option>
+                            @foreach($programs as $pb)
+                                <option value="{{ $pb->id }}">{{ $pb->program->nama_program }} - {{ $pb->customer->nama_customer }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                     <div>
+                        <label for="bukti_klaim" class="block text-sm font-medium text-slate-700">Upload Bukti Klaim</label>
+                        <input type="file" name="bukti_klaim" class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <label>Tanggal Klaim</label>
-                    <input type="date" name="tanggal_klaim" class="form-control" required>
-                </div>
-                <div class="mb-2">
-                    <label>Program Berjalan</label>
-                    <select name="program_berjalan_id" id="programSelect" class="form-select" required>
-                        <option value="">-- Pilih Program --</option>
-                        @foreach($programs as $pb)
-                            <option value="{{ $pb->id }}">
-                                {{ $pb->program->nama_program }} - {{ $pb->customer->nama_customer }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mb-2">
-                    <label>Upload Bukti Klaim</label>
-                    <input type="file" name="bukti_klaim" class="form-control">
+                {{-- Kolom Kanan --}}
+                <div class="space-y-6">
+                    <div>
+                        <label for="customer" class="block text-sm font-medium text-slate-700">Customer</label>
+                        <input type="text" id="customer" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm" readonly>
+                    </div>
+                    <div>
+                        <label for="nama_program" class="block text-sm font-medium text-slate-700">Nama Program</label>
+                        <input type="text" id="nama_program" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm" readonly>
+                    </div>
+                    <div>
+                        <label for="jenis_program" class="block text-sm font-medium text-slate-700">Jenis Program</label>
+                        <input type="text" id="jenis_program" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm" readonly>
+                    </div>
+                    <div>
+                        <label for="tipe_klaim_text" class="block text-sm font-medium text-slate-700">Tipe Klaim</label>
+                        <input type="text" id="tipe_klaim_text" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm" readonly>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="mb-2">
-                    <label>Customer</label>
-                    <input type="text" id="customer" class="form-control" readonly>
+            {{-- Tabel Klaim Outlet --}}
+            <div class="overflow-x-auto rounded-lg border border-gray-200 mt-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Outlet</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penjualan (Rp)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klaim Distributor (Rp)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klaim Sistem (Rp)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Selisih (Rp)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="claimTableBody" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-2 py-2 text-center">1</td>
+                            <td class="px-2 py-2"><input type="text" name="outlets[0][nama]" class="w-full border-gray-300 rounded-md shadow-sm" required></td>
+                            <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm penjualan-input currency-input" required></td>
+                            <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm klaim-distributor-input currency-input" required></td>
+                            {{-- Input tersembunyi untuk menyimpan nilai asli (raw) --}}
+                            <input type="hidden" name="outlets[0][penjualan]">
+                            <input type="hidden" name="outlets[0][klaim]">
+                            <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm bg-slate-100 klaim-sistem-output" readonly></td>
+                            <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm bg-slate-100 selisih-output" readonly></td>
+                            <td class="px-2 py-2"><input type="text" name="outlets[0][keterangan]" class="w-full border-gray-300 rounded-md shadow-sm"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="mt-3 text-sm text-blue-600 hover:text-blue-800 font-semibold" onclick="tambahBaris()">+ Tambah Baris Outlet</button>
+
+            {{-- Total Pembelian & Klaim Sistem --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t">
+                <div>
+                    <label for="totalPembelian" class="block text-sm font-medium text-slate-700">Total Pembelian</label>
+                    <input type="text" id="totalPembelian" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm text-right font-bold" readonly>
+                    <input type="hidden" name="total_pembelian" id="totalPembelianRaw">
                 </div>
-                <div class="mb-2">
-                    <label>Nama Program</label>
-                    <input type="text" id="nama_program" class="form-control" readonly>
-                </div>
-                <div class="mb-2">
-                    <label>Jenis Program</label>
-                    <input type="text" id="jenis_program" class="form-control" readonly>
-                </div>
-                <div class="mb-2">
-                    <label>Tipe Klaim</label>
-                    <input type="text" id="tipe_klaim_text" class="form-control" readonly>
+                <div>
+                    <label for="totalKlaimSistem" class="block text-sm font-medium text-slate-700">Total Klaim Sistem</label>
+                    <input type="text" id="totalKlaimSistem" class="mt-1 block w-full bg-slate-100 rounded-md border-slate-300 shadow-sm text-right font-bold" readonly>
                 </div>
             </div>
-        </div>
 
-        {{-- Tabel Klaim Outlet --}}
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered text-center align-middle">
-                <thead class="table-secondary">
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Outlet</th>
-                        <th>Penjualan</th>
-                        <th>Klaim Distributor</th>
-                        <th>Klaim Sistem</th>
-                        <th>Selisih</th>
-                        <th>Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody id="claimTableBody">
-                    <tr>
-                        <td>1</td>
-                        <td><input type="text" name="outlets[0][nama]" class="form-control" required></td>
-                        <td><input type="number" step="0.01" name="outlets[0][penjualan]" class="form-control penjualan-input" required></td>
-                        <td><input type="number" step="0.01" name="outlets[0][klaim]" class="form-control klaim-distributor-input" required></td>
-                        <td><input type="text" class="form-control klaim-sistem-output" readonly></td>
-                        <td><input type="text" class="form-control selisih-output" readonly></td>
-                        <td><input type="text" name="outlets[0][keterangan]" class="form-control"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="tambahBaris()">+ Tambah Baris</button>
-        </div>
-
-        {{-- Total Pembelian & Klaim Sistem --}}
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label>Total Pembelian</label>
-                <input type="text" id="totalPembelian" name="total_pembelian" class="form-control text-end" readonly>
+            {{-- Tombol Aksi --}}
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{{ route('program-claims.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-md font-semibold text-xs text-slate-700 uppercase tracking-widest shadow-sm hover:bg-slate-50">Batal</a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Simpan Klaim</button>
             </div>
-            <div class="col-md-6">
-                <label>Total Klaim Sistem</label>
-                <input type="text" id="totalKlaimSistem" class="form-control text-end" readonly>
-            </div>
-        </div>
-
-        {{-- Tombol Aksi --}}
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ route('program-claims.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </form>
 </div>
 
-{{-- Script yang sudah diperbaiki --}}
+{{-- PERBAIKAN: Memindahkan script ke dalam section content --}}
 <script>
+    // Fungsi untuk memformat angka dengan pemisah ribuan (titik)
+    function formatNumber(n) {
+        let cleanValue = n.toString().replace(/[^\d-]/g, '');
+        return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Fungsi untuk menghapus format ribuan
+    function unformatNumber(s) {
+        return s.toString().replace(/\./g, "");
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Variabel global untuk menyimpan aturan program yang dipilih
         let aturanProgram = {
             reward: 0,
             minPembelian: 0,
             tipeReward: ''
         };
 
-        // Event listener ketika dropdown 'Program Berjalan' berubah
         const programSelect = document.getElementById('programSelect');
         if (programSelect) {
             programSelect.addEventListener('change', function () {
@@ -125,51 +139,39 @@
                 }
 
                 fetch(`/program-claims/fetch/${programBerjalanId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        // Isi field informasi umum
                         document.getElementById('customer').value = data.customer;
                         document.getElementById('nama_program').value = data.nama_program;
                         document.getElementById('jenis_program').value = data.jenis_program;
                         document.getElementById('tipe_klaim_text').value = data.tipe_klaim;
                         
-                        // Simpan aturan program yang didapat dari API ke variabel global
                         aturanProgram.reward = parseFloat(data.reward) || 0;
                         aturanProgram.minPembelian = parseFloat(data.min_pembelian) || 0;
                         aturanProgram.tipeReward = data.reward_type || '';
 
-                        // Panggil fungsi update untuk menghitung ulang semua baris
                         updateSemuaBaris();
                     })
-                    .catch(error => {
-                        console.error("Gagal mengambil data program:", error);
-                        resetForm();
-                    });
+                    .catch(error => console.error("Gagal mengambil data program:", error));
             });
         }
 
-        // Fungsi untuk menghitung ulang nilai pada satu baris
         function hitungSatuBaris(row) {
             const penjualanInput = row.querySelector('.penjualan-input');
             const klaimDistributorInput = row.querySelector('.klaim-distributor-input');
             const klaimSistemOutput = row.querySelector('.klaim-sistem-output');
             const selisihOutput = row.querySelector('.selisih-output');
 
-            const penjualan = parseFloat(penjualanInput.value) || 0;
-            const klaimDistributor = parseFloat(klaimDistributorInput.value) || 0;
+            const penjualan = parseFloat(unformatNumber(penjualanInput.value)) || 0;
+            const klaimDistributor = parseFloat(unformatNumber(klaimDistributorInput.value)) || 0;
             
-            let klaimSistem = 0;
+            row.querySelector('input[name*="[penjualan]"]').value = penjualan;
+            row.querySelector('input[name*="[klaim]"]').value = klaimDistributor;
 
-            // Cek jika syarat minimal pembelian terpenuhi
+            let klaimSistem = 0;
             const syaratTerpenuhi = penjualan >= aturanProgram.minPembelian;
 
             if (syaratTerpenuhi) {
-                // Jika syarat terpenuhi, hitung berdasarkan tipe reward
                 if (aturanProgram.tipeReward === 'persen') {
                     klaimSistem = penjualan * (aturanProgram.reward / 100);
                 } else if (aturanProgram.tipeReward === 'rupiah') {
@@ -181,15 +183,13 @@
                     }
                 }
             }
-            // Jika syarat tidak terpenuhi, 'klaimSistem' akan tetap 0
 
-            klaimSistemOutput.value = klaimSistem.toFixed(2);
-            selisihOutput.value = (klaimDistributor - klaimSistem).toFixed(2);
+            klaimSistemOutput.value = formatNumber(klaimSistem.toFixed(0));
+            selisihOutput.value = formatNumber((klaimDistributor - klaimSistem).toFixed(0));
             
             return { penjualan, klaimSistem };
         }
 
-        // Fungsi untuk mengupdate semua baris dan total
         function updateSemuaBaris() {
             let totalPembelian = 0;
             let totalKlaimSistem = 0;
@@ -200,39 +200,38 @@
                 totalKlaimSistem += hasil.klaimSistem;
             });
 
-            document.getElementById('totalPembelian').value = totalPembelian.toFixed(2);
-            const totalKlaimSistemEl = document.getElementById('totalKlaimSistem');
-            if(totalKlaimSistemEl) {
-                 totalKlaimSistemEl.value = totalKlaimSistem.toFixed(2);
-            }
+            document.getElementById('totalPembelian').value = formatNumber(totalPembelian.toFixed(0));
+            document.getElementById('totalKlaimSistem').value = formatNumber(totalKlaimSistem.toFixed(0));
+            document.getElementById('totalPembelianRaw').value = totalPembelian;
         }
 
-        // Event listener untuk input di dalam tabel
         document.addEventListener('input', function (e) {
-            if (e.target && e.target.closest('#claimTableBody')) {
+            if (e.target && e.target.classList.contains('currency-input')) {
+                const value = unformatNumber(e.target.value);
+                e.target.value = formatNumber(value);
                 updateSemuaBaris();
             }
         });
 
-        // Fungsi untuk menambah baris baru
         window.tambahBaris = function() {
             const tbody = document.getElementById('claimTableBody');
             const rowCount = tbody.rows.length;
             const newRow = `
                 <tr>
-                    <td>${rowCount + 1}</td>
-                    <td><input type="text" name="outlets[${rowCount}][nama]" class="form-control" required></td>
-                    <td><input type="number" step="0.01" name="outlets[${rowCount}][penjualan]" class="form-control penjualan-input" required></td>
-                    <td><input type="number" step="0.01" name="outlets[${rowCount}][klaim]" class="form-control klaim-distributor-input" required></td>
-                    <td><input type="text" class="form-control klaim-sistem-output" readonly></td>
-                    <td><input type="text" class="form-control selisih-output" readonly></td>
-                    <td><input type="text" name="outlets[${rowCount}][keterangan]" class="form-control"></td>
+                    <td class="px-2 py-2 text-center">${rowCount + 1}</td>
+                    <td class="px-2 py-2"><input type="text" name="outlets[${rowCount}][nama]" class="w-full border-gray-300 rounded-md shadow-sm" required></td>
+                    <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm penjualan-input currency-input" required></td>
+                    <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm klaim-distributor-input currency-input" required></td>
+                    <input type="hidden" name="outlets[${rowCount}][penjualan]">
+                    <input type="hidden" name="outlets[${rowCount}][klaim]">
+                    <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm bg-slate-100 klaim-sistem-output" readonly></td>
+                    <td class="px-2 py-2"><input type="text" class="w-full border-gray-300 rounded-md shadow-sm bg-slate-100 selisih-output" readonly></td>
+                    <td class="px-2 py-2"><input type="text" name="outlets[${rowCount}][keterangan]" class="w-full border-gray-300 rounded-md shadow-sm"></td>
                 </tr>
             `;
             tbody.insertAdjacentHTML('beforeend', newRow);
         }
         
-        // Fungsi untuk mereset form
         function resetForm() {
             document.getElementById('customer').value = '';
             document.getElementById('nama_program').value = '';

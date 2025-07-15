@@ -1,87 +1,74 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('page-title', 'Edit Master Program')
 
 @section('content')
-<div class="container mt-4">
-    <h2>Edit Data Program</h2>
-
+<div class="max-w-2xl mx-auto">
     <form action="{{ route('programs.update', $program->id) }}" method="POST">
         @csrf
         @method('PUT')
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Edit Detail Master Program</h2>
 
-        {{-- Kode Program --}}
-        <div class="mb-3">
-            <label for="kode_program" class="form-label">Kode Program</label>
-            <input type="text" name="kode_program" class="form-control" value="{{ old('kode_program', $program->kode_program) }}" required>
-            @error('kode_program')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+            {{-- Form dengan layout satu kolom --}}
+            <div class="space-y-6">
 
-        {{-- Nama Program --}}
-        <div class="mb-3">
-            <label for="nama_program" class="form-label">Nama Program</label>
-            <input type="text" name="nama_program" class="form-control" value="{{ old('nama_program', $program->nama_program) }}" required>
-            @error('nama_program')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+                <div>
+                    <label for="kode_program" class="block text-sm font-medium text-slate-700">Kode Program</label>
+                    <input type="text" name="kode_program" id="kode_program" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('kode_program', $program->kode_program) }}" required>
+                </div>
 
-        {{-- Deskripsi --}}
-        <div class="mb-3">
-            <label for="deskripsi" class="form-label">Deskripsi</label>
-            <textarea name="deskripsi" class="form-control" rows="3">{{ old('deskripsi', $program->deskripsi) }}</textarea>
-            @error('deskripsi')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+                <div>
+                    <label for="nama_program" class="block text-sm font-medium text-slate-700">Nama Program</label>
+                    <input type="text" name="nama_program" id="nama_program" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('nama_program', $program->nama_program) }}" required>
+                </div>
 
-        {{-- Jenis Program --}}
-        <div class="mb-3">
-            <label for="jenis_program" class="form-label">Jenis Program</label>
-            <select name="jenis_program" class="form-control" required>
-                <option value="">-- Pilih Jenis --</option>
-                <option value="diskon" {{ old('jenis_program', $program->jenis_program) == 'diskon' ? 'selected' : '' }}>Diskon</option>
-                <option value="bundling" {{ old('jenis_program', $program->jenis_program) == 'bundling' ? 'selected' : '' }}>Bundling</option>
-                <option value="target_penjualan" {{ old('jenis_program', $program->jenis_program) == 'target_penjualan' ? 'selected' : '' }}>Target Penjualan</option>
-            </select>
-            @error('jenis_program')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+                <div>
+                    <label for="deskripsi" class="block text-sm font-medium text-slate-700">Deskripsi</label>
+                    <textarea name="deskripsi" id="deskripsi" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('deskripsi', $program->deskripsi) }}</textarea>
+                </div>
 
-        {{-- Parameter Klaim --}}
-        <div class="mb-3">
-            <label for="parameter_klaim" class="form-label">Parameter Klaim</label>
-            <select name="parameter_klaim" class="form-control" required>
-                <option value="">-- Pilih Parameter --</option>
-                <option value="per_item" {{ old('parameter_klaim', $program->parameter_klaim) == 'per_item' ? 'selected' : '' }}>Per Item</option>
-                <option value="persen" {{ old('parameter_klaim', $program->parameter_klaim) == 'persen' ? 'selected' : '' }}>Persentase</option>
-                <option value="nominal" {{ old('parameter_klaim', $program->parameter_klaim) == 'nominal' ? 'selected' : '' }}>Nominal</option>
-            </select>
-            @error('parameter_klaim')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+                <div>
+                    <label for="jenis_program" class="block text-sm font-medium text-slate-700">Jenis Program</label>
+                    <select name="jenis_program" id="jenis_program" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="diskon" {{ old('jenis_program', $program->jenis_program) == 'diskon' ? 'selected' : '' }}>Diskon</option>
+                        <option value="bundling" {{ old('jenis_program', $program->jenis_program) == 'bundling' ? 'selected' : '' }}>Bundling</option>
+                        <option value="target_penjualan" {{ old('jenis_program', $program->jenis_program) == 'target_penjualan' ? 'selected' : '' }}>Target Penjualan</option>
+                    </select>
+                </div>
 
-        {{-- Tipe Klaim --}}
-        <div class="mb-3">
-            <label for="tipe_klaim" class="form-label">Tipe Klaim</label>
-            <select name="tipe_klaim" class="form-control" required>
-                <option value="">-- Pilih Tipe --</option>
-                <option value="rupiah" {{ old('tipe_klaim', $program->tipe_klaim) == 'rupiah' ? 'selected' : '' }}>Rupiah</option>
-                <option value="unit" {{ old('tipe_klaim', $program->tipe_klaim) == 'unit' ? 'selected' : '' }}>Unit</option>
-                <option value="persen" {{ old('tipe_klaim', $program->tipe_klaim) == 'persen' ? 'selected' : '' }}>Persen</option>
-            </select>
-            @error('tipe_klaim')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+                <div>
+                    <label for="parameter_klaim" class="block text-sm font-medium text-slate-700">Parameter Klaim</label>
+                    <select name="parameter_klaim" id="parameter_klaim" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">-- Pilih Parameter --</option>
+                        <option value="per_item" {{ old('parameter_klaim', $program->parameter_klaim) == 'per_item' ? 'selected' : '' }}>Per Item</option>
+                        <option value="persen" {{ old('parameter_klaim', $program->parameter_klaim) == 'persen' ? 'selected' : '' }}>Persentase</option>
+                        <option value="nominal" {{ old('parameter_klaim', $program->parameter_klaim) == 'nominal' ? 'selected' : '' }}>Nominal</option>
+                    </select>
+                </div>
 
+                <div>
+                    <label for="tipe_klaim" class="block text-sm font-medium text-slate-700">Tipe Klaim</label>
+                    <select name="tipe_klaim" id="tipe_klaim" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">-- Pilih Tipe --</option>
+                        <option value="rupiah" {{ old('tipe_klaim', $program->tipe_klaim) == 'rupiah' ? 'selected' : '' }}>Rupiah</option>
+                        <option value="unit" {{ old('tipe_klaim', $program->tipe_klaim) == 'unit' ? 'selected' : '' }}>Unit</option>
+                        <option value="persen" {{ old('tipe_klaim', $program->tipe_klaim) == 'persen' ? 'selected' : '' }}>Persen</option>
+                    </select>
+                </div>
 
-        {{-- Tombol --}}
-        <div class="mt-4">
-            <a href="{{ route('programs.index') }}" class="btn btn-secondary">Kembali</a>
-            <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+
+            {{-- Tombol Aksi --}}
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{{ route('programs.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-md font-semibold text-xs text-slate-700 uppercase tracking-widest shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                    Batal
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Update Program
+                </button>
+            </div>
         </div>
     </form>
 </div>

@@ -1,37 +1,36 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('page-title', 'Edit Program Berjalan')
 
 @section('content')
-<div class="container mt-4">
-    <h3>Edit Program Berjalan</h3>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Ups!</strong> Ada beberapa masalah:<br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
+<div class="max-w-4xl mx-auto">
     <form action="{{ route('program-berjalan.update', $program->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Edit Detail Program Berjalan</h2>
 
-        {{-- ============================================= --}}
-        {{-- --- KELOMPOK INFORMASI UTAMA --- --}}
-        {{-- ============================================= --}}
-        <h5 class="fw-bold text-primary mt-4">Informasi Utama Program</h5>
-        <div class="p-3 border rounded bg-light mb-4">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="tanggal">Tanggal Input</label>
-                    <input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ old('tanggal', $program->tanggal) }}" required>
+            {{-- Grid untuk form --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {{-- Informasi Utama --}}
+                <div class="md:col-span-2">
+                    <h3 class="text-lg font-semibold text-slate-600 border-b pb-2 mb-4">Informasi Utama</h3>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kode_customer">Customer</label>
-                    <select name="kode_customer" id="kode_customer" class="form-control" required>
+
+                <div>
+                    <label for="tanggal" class="block text-sm font-medium text-slate-700">Tanggal Input</label>
+                    <input type="date" name="tanggal" id="tanggal" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('tanggal', $program->tanggal) }}" required>
+                </div>
+
+                <div>
+                    <label for="pic" class="block text-sm font-medium text-slate-700">PIC</label>
+                    <input type="text" name="pic" id="pic" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('pic', $program->pic) }}" placeholder="Nama Penanggung Jawab">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="kode_customer" class="block text-sm font-medium text-slate-700">Customer</label>
+                    <select name="kode_customer" id="kode_customer" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                         <option value="">-- Pilih Customer --</option>
                         @foreach ($customers as $customer)
                             <option value="{{ $customer->kode_customer }}" {{ old('kode_customer', $program->kode_customer) == $customer->kode_customer ? 'selected' : '' }}>
@@ -40,49 +39,45 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
-            <div class="mb-3">
-                <label for="kode_program">Master Program</label>
-                <select name="kode_program" id="kode_program" class="form-control" required>
-                    <option value="">-- Pilih Master Program --</option>
-                    @foreach ($programs as $prog)
-                        <option value="{{ $prog->kode_program }}" {{ old('kode_program', $program->kode_program) == $prog->kode_program ? 'selected' : '' }}>
-                            {{ $prog->nama_program }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-3">
-                <label>Periode Program</label>
-                <div class="d-flex gap-2">
-                    <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $program->start_date) }}" required>
-                    <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $program->end_date) }}" required>
-                </div>
-            </div>
-        </div>
 
-        {{-- ============================================= --}}
-        {{-- --- KELOMPOK ATURAN/MEKANISME KLAIM --- --}}
-        {{-- ============================================= --}}
-        <h5 class="fw-bold text-primary">Aturan dan Reward Program</h5>
-        <div class="p-3 border rounded bg-light mb-4">
-            <div class="mb-3">
-                <label for="min_pembelian" class="form-label fw-semibold">Syarat Minimal Pembelian (Per Transaksi)</label>
-                <input type="number" step="0.01" name="min_pembelian" class="form-control" value="{{ old('min_pembelian', $program->min_pembelian) }}" placeholder="Contoh: 500000">
-                <small class="form-text text-muted">Isi dengan nominal (misal: 500000) atau jumlah unit (misal: 10) sebagai syarat mendapatkan reward.</small>
-            </div>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="mb-3">
-                        <label for="reward" class="form-label fw-semibold">Nilai Reward</label>
-                        <input type="number" step="0.01" name="reward" class="form-control" value="{{ old('reward', $program->reward) }}" placeholder="Contoh: 10000 atau 5">
-                        <small class="form-text text-muted">Isi dengan nominal rupiah (jika reward uang) atau persentase (jika reward diskon).</small>
+                <div class="md:col-span-2">
+                    <label for="kode_program" class="block text-sm font-medium text-slate-700">Master Program</label>
+                    <select name="kode_program" id="kode_program" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">-- Pilih Master Program --</option>
+                        @foreach ($programs as $prog)
+                            <option value="{{ $prog->kode_program }}" {{ old('kode_program', $program->kode_program) == $prog->kode_program ? 'selected' : '' }}>
+                                {{ $prog->nama_program }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-700">Periode Program</label>
+                    <div class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="date" name="start_date" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('start_date', $program->start_date) }}" required>
+                        <input type="date" name="end_date" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('end_date', $program->end_date) }}" required>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="reward_type" class="form-label fw-semibold">Tipe Reward</label>
-                        <select name="reward_type" class="form-select" required>
+
+                {{-- Aturan & Reward --}}
+                <div class="md:col-span-2 mt-4">
+                    <h3 class="text-lg font-semibold text-slate-600 border-b pb-2 mb-4">Aturan & Reward</h3>
+                </div>
+
+                <div>
+                    <label for="min_pembelian" class="block text-sm font-medium text-slate-700">Syarat Minimal Pembelian</label>
+                    <input type="number" step="0.01" name="min_pembelian" id="min_pembelian" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('min_pembelian', $program->min_pembelian) }}" placeholder="Contoh: 500000">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                     <div>
+                        <label for="reward" class="block text-sm font-medium text-slate-700">Nilai Reward</label>
+                        <input type="number" step="0.01" name="reward" id="reward" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('reward', $program->reward) }}" placeholder="Contoh: 10000">
+                    </div>
+                    <div>
+                        <label for="reward_type" class="block text-sm font-medium text-slate-700">Tipe Reward</label>
+                        <select name="reward_type" id="reward_type" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                             <option value="">-- Pilih Tipe --</option>
                             <option value="rupiah" {{ old('reward_type', $program->reward_type) == 'rupiah' ? 'selected' : '' }}>Rupiah</option>
                             <option value="unit" {{ old('reward_type', $program->reward_type) == 'unit' ? 'selected' : '' }}>Unit</option>
@@ -90,56 +85,38 @@
                         </select>
                     </div>
                 </div>
-            </div>
-        </div>
+                
+                {{-- Informasi Tambahan --}}
+                <div class="md:col-span-2 mt-4">
+                    <h3 class="text-lg font-semibold text-slate-600 border-b pb-2 mb-4">Informasi Tambahan</h3>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label for="target" class="block text-sm font-medium text-slate-700">Deskripsi Target/Hadiah</label>
+                    <input type="text" name="target" id="target" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ old('target', $program->target) }}" placeholder="Contoh: Mendapatkan Diskon 5% atau Hadiah 1 Pcs Piring Cantik">
+                </div>
 
-        {{-- ============================================= --}}
-        {{-- --- KELOMPOK INFORMASI TAMBAHAN --- --}}
-        {{-- ============================================= --}}
-        <h5 class="fw-bold text-primary">Informasi Tambahan</h5>
-        <div class="p-3 border rounded bg-light mb-4">
-            <div class="mb-3">
-                <label for="target" class="form-label">Deskripsi Target/Hadiah</label>
-                <input type="text" name="target" id="target" class="form-control" value="{{ old('target', $program->target) }}" placeholder="Contoh: Mendapatkan Diskon 5% atau Hadiah 1 Pcs Piring Cantik">
-                <small class="form-text text-muted">Deskripsi singkat mengenai target atau hadiah yang akan diterima customer.</small>
-            </div>
-            <div class="mb-3">
-                <label for="pic">PIC</label>
-                <input type="text" name="pic" id="pic" class="form-control" value="{{ old('pic', $program->pic) }}">
-            </div>
-            <div class="mb-3">
-                <label for="keterangan">Keterangan / Mekanisme Lengkap</label>
-                <textarea name="keterangan" id="keterangan" rows="3" class="form-control">{{ old('keterangan', $program->keterangan) }}</textarea>
-            </div>
-            <div class="mb-3">
-                <label for="file_path">Upload File Lampiran Baru (Opsional)</label>
-                <input type="file" name="file_path" id="file_path" class="form-control" accept=".pdf,.doc,.docx">
-                @if ($program->file_path)
-                    <small class="form-text text-muted">File saat ini: <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank">Lihat File</a></small>
-                @endif
-            </div>
-        </div>
+                <div class="md:col-span-2">
+                    <label for="keterangan" class="block text-sm font-medium text-slate-700">Keterangan / Mekanisme Lengkap</label>
+                    <textarea name="keterangan" id="keterangan" rows="4" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('keterangan', $program->keterangan) }}</textarea>
+                </div>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary">Update</button>
-            <a href="{{ route('program-berjalan.index') }}" class="btn btn-secondary">Batal</a>
+                <div class="md:col-span-2">
+                    <label for="file_path" class="block text-sm font-medium text-slate-700">Upload Lampiran Baru (Opsional)</label>
+                    <input type="file" name="file_path" id="file_path" class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    @if ($program->file_path)
+                        <small class="text-slate-500 mt-2 block">File saat ini: <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank" class="text-blue-600 hover:underline">Lihat File</a></small>
+                    @endif
+                </div>
+
+            </div>
+
+            {{-- Tombol Aksi --}}
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{{ route('program-berjalan.index') }}" class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-md font-semibold text-xs text-slate-700 uppercase tracking-widest shadow-sm hover:bg-slate-50">Batal</a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Update Program</button>
+            </div>
         </div>
     </form>
 </div>
 @endsection
-
-{{-- Script untuk Select2 tetap dipertahankan karena merupakan peningkatan UX --}}
-@push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#kode_customer').select2({ placeholder: "Pilih Customer" });
-        $('#kode_program').select2({ placeholder: "Pilih Program" });
-    });
-</script>
-@endpush
-
-@push('styles')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-@endpush

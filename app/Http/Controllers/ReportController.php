@@ -13,7 +13,9 @@ use App\Models\Program;
 use App\Models\InventoryTransaction;
 use App\Models\ProgramBerjalan;
 use App\Exports\BudgetExport;
-use App\Exports\AbsensiExport; // <-- 1. Import kelas AbsensiExport
+use App\Exports\AbsensiExport;
+use App\Exports\ProgramBerjalanExport;
+use App\Exports\ProgramClaimsExport;
 use Maatwebsite\Excel\Facades\Excel; // Pastikan ini juga di-import
 
 class ReportController extends Controller
@@ -208,11 +210,19 @@ class ReportController extends Controller
         return Excel::download(new BudgetExport($request), 'laporan-budget-'.date('Y-m-d').'.xlsx');
     }
 
-    /**
-     * Handle export request for absensi report.
-     */
     public function exportAbsensiExcel(Request $request)
     {
         return Excel::download(new AbsensiExport($request), 'laporan-absensi-'.date('Y-m-d').'.xlsx');
     }
+
+    public function exportProgramExcel(Request $request)
+    {
+        return Excel::download(new ProgramBerjalanExport($request), 'laporan-program-berjalan-'.date('Y-m-d').'.xlsx');
+    }
+    
+    public function exportKlaimExcel(Request $request)
+    {
+        return Excel::download(new ProgramClaimsExport($request), 'laporan-program-berjalan-'.date('Y-m-d').'.xlsx');
+    }
+
 }

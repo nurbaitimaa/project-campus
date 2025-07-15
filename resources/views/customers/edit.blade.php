@@ -1,35 +1,58 @@
-@extends('layouts.app')
+@extends('layouts.admin') {{-- Menggunakan layout admin untuk konsistensi --}}
 
 @section('content')
-<div class="container mt-4">
-    <h3 class="mb-4">Edit Customer</h3>
+<div class="container mx-auto mt-6 px-4 sm:px-6 lg:px-8"> {{-- Container utama dengan padding responsif --}}
+    <h2 class="text-2xl font-bold text-slate-800 mb-4">Edit Customer</h2>
 
-    <form action="{{ route('customers.update', $customer->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-3">
-            <label for="kode_customer" class="form-label">Kode Customer</label>
-            <input type="text" class="form-control" name="kode_customer" value="{{ $customer->kode_customer }}" required>
+    {{-- Pesan error validasi dari Laravel --}}
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4 shadow-sm">
+            <strong class="font-bold">Terjadi kesalahan!</strong>
+            <span class="block sm:inline">Mohon periksa kembali input Anda.</span>
+            <ul class="mt-2 list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    @endif
 
-        <div class="mb-3">
-            <label for="nama_customer" class="form-label">Nama Customer</label>
-            <input type="text" class="form-control" name="nama_customer" value="{{ $customer->nama_customer }}" required>
-        </div>
+    <div class="bg-white p-6 rounded-lg shadow-xl"> {{-- Card-like container untuk form --}}
+        <h3 class="text-xl font-semibold text-slate-800 mb-6">Informasi Customer</h3>
+        
+        <form action="{{ route('customers.update', $customer->id) }}" method="POST">
+            @csrf
+            @method('PUT') {{-- Pastikan method PUT tetap ada --}}
 
-        <div class="mb-3">
-            <label for="alamat" class="form-label">Alamat</label>
-            <textarea class="form-control" name="alamat" rows="3">{{ $customer->alamat }}</textarea>
-        </div>
+            <div class="mb-4"> {{-- Margin bottom lebih besar untuk setiap field --}}
+                <label for="kode_customer" class="block font-semibold text-slate-700 mb-1">Kode Customer</label>
+                <input type="text" id="kode_customer" name="kode_customer" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('kode_customer', $customer->kode_customer) }}" required>
+            </div>
 
-        <div class="mb-3">
-            <label for="telepon" class="form-label">Telepon</label>
-            <input type="text" class="form-control" name="telepon" value="{{ $customer->telepon }}">
-        </div>
+            <div class="mb-4">
+                <label for="nama_customer" class="block font-semibold text-slate-700 mb-1">Nama Customer</label>
+                <input type="text" id="nama_customer" name="nama_customer" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('nama_customer', $customer->nama_customer) }}" required>
+            </div>
 
-        <a href="{{ route('customers.index') }}" class="btn btn-secondary">Kembali</a>
-        <button type="submit" class="btn btn-success">Update</button>
-    </form>
+            <div class="mb-4">
+                <label for="alamat" class="block font-semibold text-slate-700 mb-1">Alamat</label>
+                <textarea id="alamat" name="alamat" rows="3" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">{{ old('alamat', $customer->alamat) }}</textarea>
+            </div>
+
+            <div class="mb-6"> {{-- Margin bottom lebih besar sebelum tombol --}}
+                <label for="telepon" class="block font-semibold text-slate-700 mb-1">Telepon</label>
+                <input type="text" id="telepon" name="telepon" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="{{ old('telepon', $customer->telepon) }}">
+            </div>
+
+            <div class="flex items-center justify-end"> {{-- Penempatan tombol di kanan bawah --}}
+                <a href="{{ route('customers.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 shadow-sm">
+                    Kembali
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150 shadow-md ml-3">
+                    Update
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection

@@ -185,7 +185,9 @@ Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/absensi/export-excel', [ReportController::class, 'exportAbsensiExcel'])->name('absensi.exportExcel');
         Route::get('/inventory', [ReportController::class, 'inventory'])->name('inventory');
         Route::get('/klaim', [ReportController::class, 'klaim'])->name('klaim');
+        Route::get('/klaim/export-excel', [ReportController::class, 'exportKlaimExcel'])->name('klaim.exportExcel');
         Route::get('/program', [ReportController::class, 'program'])->name('program');
+        Route::get('/program/export-excel', [ReportController::class, 'exportProgramExcel'])->name('program.exportExcel');
         Route::get('/budget', [ReportController::class, 'budget'])->name('budget');
         Route::get('/budget/export-excel', [ReportController::class, 'exportBudgetExcel'])->name('budget.exportExcel');
     });

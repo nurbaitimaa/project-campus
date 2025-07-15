@@ -94,19 +94,25 @@ class ProgramClaimController extends Controller
         return redirect()->route('program-claims.index')->with('success', 'Klaim berhasil disimpan.');
     }
 
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function edit($id)
     {
+        // Menggunakan findOrFail untuk keamanan dan memuat semua relasi yang diperlukan
         $programClaim = ProgramClaim::with('details', 'programBerjalan.program', 'programBerjalan.customer')->findOrFail($id);
+        
+        // Mengambil semua program berjalan untuk pilihan di dropdown
         $programs = ProgramBerjalan::with('program', 'customer')->get();
 
+        // Mengirim data ke view dengan struktur yang lebih sederhana
         return view('program-claims.edit', [
             'programClaim' => $programClaim,
             'programs' => $programs,
-            'customer' => $programClaim->programBerjalan->customer->nama_customer,
-            'nama_program' => $programClaim->programBerjalan->program->nama_program,
-            'jenis_program' => $programClaim->programBerjalan->program->jenis_program,
-            'tipe_klaim' => $programClaim->programBerjalan->program->tipe_klaim,
-            'nilai_klaim' => $programClaim->programBerjalan->reward,
         ]);
     }
 
@@ -178,14 +184,12 @@ class ProgramClaimController extends Controller
         return redirect()->route('program-claims.index')->with('success', 'Klaim berhasil diperbarui.');
     }
     
-    // --- FUNGSI BARU UNTUK PREVIEW ---
     public function preview($id)
     {
         $claim = ProgramClaim::with('details', 'programBerjalan.program', 'programBerjalan.customer')->findOrFail($id);
         return view('program-claims.preview', compact('claim'));
     }
 
-    // --- FUNGSI BARU UNTUK HAPUS ---
     public function destroy($id)
     {
         $claim = ProgramClaim::findOrFail($id);
